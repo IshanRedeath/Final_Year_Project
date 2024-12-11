@@ -19,7 +19,7 @@ import GoogleIcon from "@mui/icons-material/Google";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import BookmarksIcon from "@mui/icons-material/Bookmarks";
 //import AppTheme from "./AppTheme";
-import ColorModeSelect from "./ColorModeSelect";
+//import ColorModeSelect from "./ColorModeSelect";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",

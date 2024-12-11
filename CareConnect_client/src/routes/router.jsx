@@ -1,26 +1,28 @@
-import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
-//import Home from "./pages/Home";
-//import Unauthorized from "./pages/Unauthorized";
-
-// Import routes from the separate files
+import {
+  createBrowserRouter,
+  Navigate,
+  Outlet,
+  redirect,
+  RouterProvider,
+  useLocation,
+} from "react-router-dom";
 import adminRoutes from "./adminRoutes";
 import doctorRoutes from "./doctorRoutes";
 import patientRoutes from "./patientRoutes";
-import SessionRedirect from "./sessionRedirect";
-import Headerbar from "../components/Common/Header/Headerbar";
+import SessionRedirect from "./SessionRedirect";
+import PatientHeaderBar from "../components/Patient/PatientHeaderbar";
 import RouteAuth from "./RouteAuth";
 import Login from "../pages/patientPortal/Login";
+import { useEffect } from "react";
+
 // Combine routes
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: (
-      <>
-        <SessionRedirect />
-        <RootLayout />
-      </>
-    ),
+
+    element: <RootLayout />,
+
     children: [
       adminRoutes,
       doctorRoutes,
@@ -30,7 +32,7 @@ export const router = createBrowserRouter([
   },
   {
     path: "*",
-    element: <SessionRedirect />,
+    element: <Navigate to="/" />,
   },
   {
     path: "/unauthorized",
@@ -41,8 +43,7 @@ export const router = createBrowserRouter([
 function RootLayout() {
   return (
     <>
-      <Headerbar />
-      <div style={{ width: "auto", height: "45px" }}></div>
+      <SessionRedirect />
       <Outlet />
     </>
   );

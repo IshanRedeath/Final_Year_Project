@@ -1,0 +1,37 @@
+[
+  {
+    "serviceId": "1",
+    "name": "OPD",
+    "description": "Outpatient Department for general consultation and diagnosis.",
+    "imagePath": "/src/assets/channel_services/opd.png",
+    "specialtyId": ["general_medicine", "family_medicine"]
+  },
+  {
+    "serviceId": "2",
+    "name": "Eye Clinic",
+    "description": "Comprehensive eye care including vision tests and treatments.",
+    "imagePath": "/src/assets/channel_services/eye_clinic.jpeg",
+    "specialtyId": ["ophthalmology"]
+  },
+  {
+    "serviceId": "3",
+    "name": "Dental Clinic",
+    "description": "Dental care and oral hygiene services for all ages.",
+    "imagePath": "/src/assets/channel_services/dental_clinic2.jpg",
+    "specialtyId": ["dentistry", "orthodontics"]
+  },
+  {
+    "serviceId": "4",
+    "name": "Pregnancy Care",
+    "description": "Specialized care for wound management and prenatal services.",
+    "imagePath": "/src/assets/channel_services/pregnancy.jpg",
+    "specialtyId": ["obstetrics", "emergency_medicine"]
+  },
+  {
+    "serviceId": "5",
+    "name": "Muscle and Sports Therapy",
+    "description": "Treatment and rehabilitation for muscle injuries and sports-related conditions.",
+    "imagePath": "/src/assets/channel_services/muscle_sports_therapy.jpg",
+    "specialtyId": ["physiotherapy", "sports_medicine"]
+  }
+]

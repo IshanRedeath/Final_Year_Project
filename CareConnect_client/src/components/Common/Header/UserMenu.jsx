@@ -1,18 +1,17 @@
 import React from "react";
-import {
-  IconButton,
-  Button,
-  Avatar,
-  Menu,
-  MenuItem,
-  Tooltip,
-  Badge,
-} from "@mui/material";
+import IconButton from "@mui/material/IconButton";
+import Button from "@mui/material/Button";
+import Avatar from "@mui/material/Avatar";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Tooltip from "@mui/material/Tooltip";
+import Badge from "@mui/material/Badge";
+
 import Grid from "@mui/material/Grid2";
 
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import LogoutIcon from "@mui/icons-material/Logout";
-import { Link, NavLink } from "react-router-dom";
+//import { Link, NavLink } from "react-router-dom";
 
 const UserMenu = ({ isLoggedIn, user, onLogout }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -27,41 +26,59 @@ const UserMenu = ({ isLoggedIn, user, onLogout }) => {
 
   return isLoggedIn ? (
     <div>
-      <Tooltip title="Notifications">
-        <IconButton color="inherit">
-          <Badge badgeContent={4} color="error">
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
-      </Tooltip>{" "}
-      <Grid sx={{ display: { xs: "none", md: "inline-flex" }, mx: 3 }}>
-        <Button onClick={onLogout}>
-          Logout <LogoutIcon fontSize="medium" sx={{ pt: 0.5 }} />
-        </Button>
-      </Grid>
-      <Tooltip title="Profile">
-        <IconButton onClick={handleMenuOpen} color="inherit">
-          <Avatar alt={user.name} src={user.profilePic} />
-        </IconButton>
-      </Tooltip>
-      <Menu
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleMenuClose}
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
+      <Grid
+        container
+        direction="row" // Ensure horizontal alignment
+        alignItems="center" // Vertically center items
+        justifyContent="space-between" // Spread items evenly
+        spacing={2}
       >
-        <MenuItem
-          onClick={onLogout}
-          sx={{ display: { sm: "block", md: "none" } }}
+        <Grid item>
+          <Tooltip title="Notifications">
+            <IconButton color="inherit">
+              <Badge
+                badgeContent={4}
+                color="error"
+                sx={{
+                  "& .MuiBadge-badge": {
+                    fontSize: 9,
+                    height: 14,
+                    minWidth: 13,
+                  },
+                }}
+              >
+                <NotificationsIcon fontSize="small" />
+              </Badge>
+            </IconButton>
+          </Tooltip>{" "}
+        </Grid>
+        <Grid item>
+          <Tooltip title="Profile">
+            <IconButton onClick={handleMenuOpen} color="inherit">
+              <Avatar
+                alt={user.name}
+                src={user.profilePic}
+                sx={{ width: 25, height: 25 }}
+              />
+            </IconButton>
+          </Tooltip>
+        </Grid>
+        <Menu
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleMenuClose}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
         >
-          <LogoutIcon fontSize="small" />
-          &nbsp; Logout
-        </MenuItem>
-        <MenuItem>Hello</MenuItem>
-      </Menu>
+          <MenuItem onClick={onLogout}>
+            <LogoutIcon fontSize="small" />
+            &nbsp; Logout
+          </MenuItem>
+          <MenuItem>Hello</MenuItem>
+        </Menu>{" "}
+      </Grid>
     </div>
   ) : (
     <Button color="inherit">Login</Button>

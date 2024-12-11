@@ -38,7 +38,12 @@ function SelectVisitType() {
                 <Tooltip title={service.description} placement="bottom">
                   <Card sx={{ borderRadius: 5, maxHeight: 170 }}>
                     <CardActionArea>
-                      <CardMedia component={'img'} image={service.imagePath} alt={service.name} height={130} />
+                      <CardMedia
+                        component={'img'}
+                        image={service.imagePath}
+                        alt={service.name}
+                        height={130}
+                      />
                       <CardContent
                         sx={{
                           display: 'flex',
@@ -110,7 +115,9 @@ function SearchDoctor({ closeFunction }) {
             getOptionLabel={(option) => option.label}
             value={selectedDoctor}
             onChange={(event, newValue) => setSelectedDoctor(newValue)}
-            renderInput={(params) => <TextField {...params} label="Search Doctor" variant="outlined" />}
+            renderInput={(params) => (
+              <TextField {...params} label="Search Doctor" variant="outlined" />
+            )}
           />
 
           {/* Autocomplete for Specialties */}
@@ -119,7 +126,9 @@ function SearchDoctor({ closeFunction }) {
             //getOptionLabel={(option) => option.label}
             value={selectedSpecialty}
             onChange={(event, newValue) => setSelectedSpecialty(newValue)}
-            renderInput={(params) => <TextField {...params} label="Search Specialty" variant="outlined" />}
+            renderInput={(params) => (
+              <TextField {...params} label="Search Specialty" variant="outlined" />
+            )}
           />
 
           {/* Date Picker */}
@@ -134,7 +143,12 @@ function SearchDoctor({ closeFunction }) {
           />
 
           {/* Submit Button */}
-          <Button type="submit" variant="contained" color="primary" onClick={closeFunction}>
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            onClick={closeFunction}
+          >
             Search
           </Button>
         </Box>
@@ -144,6 +158,7 @@ function SearchDoctor({ closeFunction }) {
   );
 }
 const drawerWidth = 300;
+
 export default function AvailabilityCheckLayout() {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
@@ -224,7 +239,7 @@ export default function AvailabilityCheckLayout() {
       {/* Desktop search form view Start */}
       <Grid
         item
-        size={{ lg: 3 }}
+        size={{ lg: 3, xl: 2 }}
         sx={{
           display: { xs: 'none', lg: 'block' },
           height: '80vh',
@@ -250,13 +265,14 @@ export default function AvailabilityCheckLayout() {
       {/* Main Section Starts */}
       <Grid
         item
-        size={{ lg: 9 }}
+        size={{ lg: 9, xl: 10 }}
         sx={{
           overflowX: { xs: 'none', lg: 'auto' },
           height: { xs: 'auto', lg: '100vh' },
         }}
       >
-        <SelectVisitType /> <SelectVisitType /> <SelectVisitType /> <SelectVisitType /> <SelectVisitType />
+        <SelectVisitType /> <SelectVisitType /> <SelectVisitType /> <SelectVisitType />{' '}
+        <SelectVisitType />
       </Grid>
       {/* Section Ends */}
     </Grid>

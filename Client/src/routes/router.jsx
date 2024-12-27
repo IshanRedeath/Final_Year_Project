@@ -5,37 +5,41 @@ import {
   redirect,
   RouterProvider,
   useLocation,
-} from "react-router-dom";
-import adminRoutes from "./adminRoutes";
-import doctorRoutes from "./doctorRoutes";
-import patientRoutes from "./patientRoutes";
-import SessionRedirect from "./SessionRedirect";
-import PatientHeaderBar from "../components/Patient/PatientHeaderbar";
-import RouteAuth from "./RouteAuth";
-import Login from "../pages/patientPortal/Login";
-import { useEffect } from "react";
+} from 'react-router-dom';
+import adminRoutes from './adminRoutes';
+import doctorRoutes from './doctorRoutes';
+import patientRoutes from './patientRoutes';
+import SessionRedirect from './SessionRedirect';
+import PatientHeaderBar from '../components/Patient/PatientHeaderbar';
+import RouteAuth from './RouteAuth';
+import Login from '../pages/patientPortal/Login';
+import { useEffect } from 'react';
+import { Dashboard } from '@mui/icons-material';
+import DashboardLayout from '../layouts/Dashboard';
 
 // Combine routes
-
+//TODO: EDit session redirect, add patient routes, add unauthorized route
 export const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
 
     element: <RootLayout />,
 
     children: [
       adminRoutes,
       doctorRoutes,
-      patientRoutes,
-      { path: "/login", element: <Login /> },
+
+      //FIXME: Delete below line
     ],
   },
+  patientRoutes,
   {
-    path: "*",
+    path: '*',
     element: <Navigate to="/" />,
   },
+  { path: '/login', element: <Login /> },
   {
-    path: "/unauthorized",
+    path: '/unauthorized',
     element: <h1>Unauthorized </h1>, //Replace with <Unauthorized/> component
   },
 ]);
@@ -43,8 +47,8 @@ export const router = createBrowserRouter([
 function RootLayout() {
   return (
     <>
-      <SessionRedirect />
-      <Outlet />
+      {/* <SessionRedirect /> */}
+      <DashboardLayout />
     </>
   );
 }

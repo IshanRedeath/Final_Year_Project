@@ -1,13 +1,16 @@
 import { BrowserRouter as Router, RouterProvider } from 'react-router-dom';
 
-import image1 from './assets/1527071.jpg';
-import image2 from './assets/6141935.jpg';
 import { router } from './routes/router';
-
+import { MenuProvider } from './context/dashboardMenuContext';
+import ThemeCustomization from 'themes';
 function App() {
   return (
     <div>
-      <RouterProvider router={router} />
+      <ThemeCustomization>
+        <MenuProvider>
+          <RouterProvider router={router} />
+        </MenuProvider>
+      </ThemeCustomization>
     </div>
   );
 }

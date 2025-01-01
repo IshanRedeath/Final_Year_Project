@@ -1,5 +1,7 @@
 import * as React from 'react';
-import { DataGrid } from '@mui/x-data-grid';
+//MUiX DataGrid Table Library
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+//MUI Core Componensts
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid2';
 import Avatar from '@mui/material/Avatar';
@@ -7,7 +9,20 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+//Mui Icons
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
+import EmailTwoToneIcon from '@mui/icons-material/EmailTwoTone';
+import CircleIcon from '@mui/icons-material/Circle';
+import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
+import PrintTwoToneIcon from '@mui/icons-material/PrintTwoTone';
+import PersonAddTwoToneIcon from '@mui/icons-material/PersonAddTwoTone';
+import { apiFetch } from 'api/base';
+import { getUsersUsingAxios } from 'api/testAPIs';
+
+//Render User Table fields
 const renderUserNameField = (params) => (
   <Grid container alignItems="center" spacing={2} style={{ maxWidth: 300 }}>
     <Grid item>
@@ -31,7 +46,27 @@ const renderUserNameField = (params) => (
     </Grid>
   </Grid>
 );
-const RenderUserModifyMenu = (params) => {
+const renderStatusField = (params) => {
+  const value = params.row.status;
+  let props = {};
+
+  if (value === 'Active') {
+    props = { color: 'green' };
+  } else if (value === 'Pending') {
+    props = { color: 'yellow' };
+  } else {
+    props = { color: 'red' };
+  }
+
+  return (
+    <Box display="flex" alignItems="center" width="100%" height="100%" gap={1}>
+      <CircleIcon sx={{ ...props, fontSize: 13 }} />
+      <Typography fontSize={12}>{value}</Typography>
+    </Box>
+  );
+};
+const ITEM_HEIGHT = 48;
+const RenderUserActionMenu = (params) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -54,10 +89,154 @@ const RenderUserModifyMenu = (params) => {
       >
         <MoreVertIcon />
       </IconButton>
+      <Menu
+        id="long-menu"
+        MenuListProps={{
+          'aria-labelledby': 'long-button',
+        }}
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        slotProps={{
+          paper: {
+            style: {
+              maxHeight: ITEM_HEIGHT * 4.5,
+              width: '15ch',
+            },
+          },
+        }}
+      >
+        {options.map((option) => {
+          return (
+            <MenuItem
+              key={option.name}
+              onClick={() => {
+                option.action(params.row.id);
+                handleClose();
+              }}
+            >
+              <Box display="flex" alignItems="center" gap={1}>
+                {option.icon}
+                {option.name}
+              </Box>
+            </MenuItem>
+          );
+        })}
+      </Menu>
     </>
   );
 };
 
+//User Table Option functions
+const handleUserEdit = (id) => {
+  console.log('edit ', id);
+};
+const handleUserDelete = (id) => {
+  console.log('delete ', id);
+};
+const handleUserEmail = (id) => {
+  console.log('email ', id);
+};
+const handleUserView = (id) => {
+  console.log('view ', id);
+};
+
+//User Table Each row menu Options List
+const options = [
+  { name: 'Edit', icon: <EditTwoToneIcon />, action: (id) => handleUserEdit(id) },
+
+  {
+    name: 'Email',
+    icon: <EmailTwoToneIcon color="primary" />,
+    action: (id) => handleUserEmail(id),
+  },
+  {
+    name: 'View',
+    icon: <PrintTwoToneIcon color="success" />,
+    action: (id) => handleUserView(id),
+  },
+  {
+    name: 'Delete',
+    icon: <DeleteTwoToneIcon color="error" />,
+    action: (id) => handleUserDelete(id),
+  },
+];
+
+const paginationModel = { page: 0, pageSize: 10 };
+
+export default function UserTable() {
+  const [rowIds, setRowIds] = React.useState([]);
+  // const [rows, setRows] = React.useState();
+  // React.useEffect(() => {
+  //   try {
+  //     getUsersUsingAxios('/users')
+  //       .then((res) => {
+  //         setRows(res.data);
+  //       })
+  //       .catch((err) => {
+  //         console.error('Connection Error ', err);
+  //       });
+
+  //     console.log(rows);
+  //   } catch (e) {
+  //     console.log('Error: ', e);
+  //   }
+  // }, []);
+
+  return (
+    <Paper sx={{ height: 400, width: '100%' }}>
+      <Grid
+        spacing={2}
+        container
+        justifyContent="flex-start"
+        alignItems="center"
+        sx={{ height: 45, backgroundColor: 'lightBlue' }}
+      >
+        <Grid
+          item
+          sx={{
+            opacity: rowIds.length > 0 ? 1 : 0,
+            visibility: rowIds.length > 0 ? 'visible' : 'hidden',
+            transition: 'opacity 0.3s ease-in-out, visibility 0.3s ease-in-out',
+          }}
+        >
+          <Button variant="contained" color="error" sx={{ mx: 1 }}>
+            <DeleteTwoToneIcon />{' '}
+          </Button>
+          <Button variant="contained" color="primary">
+            <EmailTwoToneIcon />{' '}
+          </Button>
+        </Grid>{' '}
+        <Grid item sx={{ flexGrow: 1 }}></Grid>
+        <Grid item sx={{ mx: 1 }}>
+          <Button variant="contained">
+            <PersonAddTwoToneIcon sx={{ mr: 2 }} /> Add User
+          </Button>
+        </Grid>
+      </Grid>
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        rowHeight={50}
+        initialState={{ pagination: { paginationModel } }}
+        pageSizeOptions={[5, 10]}
+        checkboxSelection
+        disableRowSelectionOnClick
+        onRowSelectionModelChange={(ids) => {
+          setRowIds(ids);
+          console.log(ids);
+        }}
+        slotProps={{
+          toolbar: {
+            showQuickFilter: true,
+          },
+        }}
+        slots={{ toolbar: GridToolbar }}
+        sx={{ border: 0 }}
+      />
+    </Paper>
+  );
+}
 const columns = [
   { field: 'id', headerName: 'ID', width: 70 },
 
@@ -70,56 +249,19 @@ const columns = [
   { field: 'contactNo', headerName: 'Contact', width: 130 },
   { field: 'role', headerName: 'Access', width: 130 },
   { field: 'department', headerName: 'Department', width: 90 },
-  { field: 'status', headerName: 'Status', width: 70 },
-  { field: 'createdAt', headerName: 'Created At', width: 80 },
-  { field: 'lastActive', headerName: 'Last Active', width: 80 },
   {
-    field: 'actions',
-    headerName: 'Actions',
+    field: 'status',
+    headerName: 'Status',
+    width: 100,
+    renderCell: (params) => renderStatusField(params),
+  },
+  { field: 'createdAt', headerName: 'Created At', width: 100 },
+  { field: 'lastActive', headerName: 'Last Active', width: 100 },
+  {
     width: 50,
-    renderCell: (params) => RenderUserModifyMenu(params),
+    renderCell: (params) => RenderUserActionMenu(params),
   },
 ];
-
-// const rows = [
-//   { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
-//   { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
-//   { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
-//   { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
-//   { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-//   { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
-//   { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-//   { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-//   { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
-//   { id: 10, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-//   { id: 11, lastName: 'Melisandre', firstName: null, age: 150 },
-//   { id: 12, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-//   { id: 13, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-//   { id: 14, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
-// ];
-
-const paginationModel = { page: 0, pageSize: 10 };
-
-export default function UserTable() {
-  return (
-    <Paper sx={{ height: 400, width: '100%' }}>
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        rowHeight={50}
-        initialState={{ pagination: { paginationModel } }}
-        pageSizeOptions={[5, 10]}
-        checkboxSelection
-        disableRowSelectionOnClick
-        onRowSelectionModelChange={(ids) => {
-          console.log(ids);
-        }}
-        sx={{ border: 0 }}
-      />
-    </Paper>
-  );
-}
-
 const rows = [
   {
     id: 1,

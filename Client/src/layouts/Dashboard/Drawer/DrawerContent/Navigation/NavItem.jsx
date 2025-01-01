@@ -29,9 +29,7 @@ export default function NavItem({ item, level }) {
 
   let listItemProps = {
     // eslint-disable-next-line react/display-name
-    component: forwardRef((props, ref) => (
-      <Link ref={ref} {...props} to={`/admin-dashboard${item.url}`} target={itemTarget} />
-    )),
+    component: forwardRef((props, ref) => <Link ref={ref} {...props} to={item.url} target={itemTarget} />),
     //FIXME: to={`/admin-dashboard${item.url}`} as GLOBAL user role assignment
   };
   if (item?.external) {
@@ -39,21 +37,20 @@ export default function NavItem({ item, level }) {
   }
 
   const Icon = item.icon;
-  const itemIcon = item.icon ? (
-    <Icon style={{ fontSize: drawerOpen ? '1rem' : '1.25rem' }} />
-  ) : (
-    false
-  );
+  const itemIcon = item.icon ? <Icon style={{ fontSize: drawerOpen ? '1rem' : '1.25rem' }} /> : false;
 
   const { pathname } = useLocation();
+  // Split the pathname into segments
+  const segments = pathname.split('/').filter(Boolean);
 
-  const isSelected =
-    !!matchPath({ path: `/admin-dashboard${item.url}` }, pathname) ||
-    openItem === item.id;
+  // Join the first two segments
+  const firstTwoPaths = `/${segments.slice(0, 2).join('/')}`;
+
+  const isSelected = !!matchPath({ path: item.url }, firstTwoPaths) || openItem === item.id;
 
   // active menu item on page load
   useEffect(() => {
-    if (pathname === `/admin-dashboard${item.url}`) {
+    if (firstTwoPaths === item.url) {
       handlerActiveItem(item.id);
     }
     // eslint-disable-next-line
@@ -129,10 +126,7 @@ export default function NavItem({ item, level }) {
       {(drawerOpen || (!drawerOpen && level !== 1)) && (
         <ListItemText
           primary={
-            <Typography
-              variant="h6"
-              sx={{ color: isSelected ? iconSelectedColor : textColor }}
-            >
+            <Typography variant="h6" sx={{ color: isSelected ? iconSelectedColor : textColor }}>
               {item.title}
             </Typography>
           }

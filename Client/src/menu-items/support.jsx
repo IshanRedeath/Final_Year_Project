@@ -19,7 +19,7 @@ const support = {
       id: 'sample-page',
       title: 'Sample Page',
       type: 'item',
-      url: '/sample-page',
+      url: '/admin-dashboard/sample-page',
       icon: icons.GTranslateOutlinedIcon,
     },
     {

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useState, useEffect } from 'react';
 //MUiX DataGrid Table Library
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 //MUI Core Componensts
@@ -21,6 +21,7 @@ import PrintTwoToneIcon from '@mui/icons-material/PrintTwoTone';
 import PersonAddTwoToneIcon from '@mui/icons-material/PersonAddTwoTone';
 import { apiFetch } from 'api/base';
 import { getUsersUsingAxios } from 'api/testAPIs';
+import { Tooltip } from '@mui/material';
 
 //Render User Table fields
 const renderUserNameField = (params) => (
@@ -67,7 +68,7 @@ const renderStatusField = (params) => {
 };
 const ITEM_HEIGHT = 48;
 const RenderUserActionMenu = (params) => {
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -143,70 +144,102 @@ const handleUserView = (id) => {
 
 //User Table Each row menu Options List
 const options = [
-  { name: 'Edit', icon: <EditTwoToneIcon />, action: (id) => handleUserEdit(id) },
+  {
+    name: 'Delete',
+    icon: <DeleteTwoToneIcon />,
+    action: (id) => handleUserDelete(id),
+    variant: 'contained',
+    color: 'error',
+
+    visible: true,
+  },
 
   {
     name: 'Email',
-    icon: <EmailTwoToneIcon color="primary" />,
+    icon: <EmailTwoToneIcon />,
     action: (id) => handleUserEmail(id),
+    variant: 'contained',
+
+    visible: true,
+  },
+  {
+    name: 'Edit',
+    icon: <EditTwoToneIcon color="action" />,
+    action: (id) => handleUserEdit(id),
+    variant: 'outlined',
+
+    visible: false,
   },
   {
     name: 'View',
     icon: <PrintTwoToneIcon color="success" />,
     action: (id) => handleUserView(id),
-  },
-  {
-    name: 'Delete',
-    icon: <DeleteTwoToneIcon color="error" />,
-    action: (id) => handleUserDelete(id),
+    variant: 'outlined',
+    visible: false,
   },
 ];
 
 const paginationModel = { page: 0, pageSize: 10 };
 
 export default function UserTable() {
-  const [rowIds, setRowIds] = React.useState([]);
-  // const [rows, setRows] = React.useState();
-  // React.useEffect(() => {
-  //   try {
-  //     getUsersUsingAxios('/users')
-  //       .then((res) => {
-  //         setRows(res.data);
-  //       })
-  //       .catch((err) => {
-  //         console.error('Connection Error ', err);
-  //       });
+  const [rowIds, setRowIds] = useState([]);
+  const [rows, setRows] = useState();
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    try {
+      setLoading(true);
+      getUsersUsingAxios('/users', { timeout: 10000 })
+        .then((res) => {
+          setRows(res.data);
+        })
+        .catch((err) => {
+          console.error('Connection Error ', err);
+        })
+        .finally(() => {
+          setTimeout(() => {
+            setLoading(false);
+          }, 2000);
+        });
 
-  //     console.log(rows);
-  //   } catch (e) {
-  //     console.log('Error: ', e);
-  //   }
-  // }, []);
+      console.log(rows);
+    } catch (e) {
+      console.log('Error: ', e);
+      setLoading(false);
+    }
+  }, []);
 
   return (
     <Paper sx={{ height: 400, width: '100%' }}>
       <Grid
-        spacing={2}
+        spacing={1}
         container
         justifyContent="flex-start"
         alignItems="center"
-        sx={{ height: 45, backgroundColor: 'lightBlue' }}
+        sx={{ height: 45, backgroundColor: 'lightBlue', pl: 1 }}
       >
-        <Grid
-          item
-          sx={{
-            opacity: rowIds.length > 0 ? 1 : 0,
-            visibility: rowIds.length > 0 ? 'visible' : 'hidden',
-            transition: 'opacity 0.3s ease-in-out, visibility 0.3s ease-in-out',
-          }}
-        >
-          <Button variant="contained" color="error" sx={{ mx: 1 }}>
-            <DeleteTwoToneIcon />{' '}
-          </Button>
-          <Button variant="contained" color="primary">
-            <EmailTwoToneIcon />{' '}
-          </Button>
-        </Grid>{' '}
+        {options.map((option) => {
+          const len = rowIds.length;
+
+          const visibility = len === 1 || (option.visible && len > 1);
+          return (
+            <Grid
+              key={option.name}
+              item
+              sx={{
+                opacity: visibility ? 1 : 0,
+                visibility: visibility ? 'visible' : 'hidden',
+                transition: 'opacity 0.3s ease-in-out, visibility 0.3s ease-in-out',
+              }}
+            >
+              <Tooltip title={option.name}>
+                <Button variant={option.variant} color={option.color}>
+                  {option.icon}
+                </Button>
+              </Tooltip>
+            </Grid>
+          );
+        })}
+
         <Grid item sx={{ flexGrow: 1 }}></Grid>
         <Grid item sx={{ mx: 1 }}>
           <Button variant="contained">
@@ -221,18 +254,18 @@ export default function UserTable() {
         initialState={{ pagination: { paginationModel } }}
         pageSizeOptions={[5, 10]}
         checkboxSelection
-        disableRowSelectionOnClick
         onRowSelectionModelChange={(ids) => {
           setRowIds(ids);
           console.log(ids);
         }}
+        loading={loading}
         slotProps={{
           toolbar: {
             showQuickFilter: true,
           },
+          loadingOverlay: { variant: 'circular-progress', noRowsVariant: 'skeleton' },
         }}
         slots={{ toolbar: GridToolbar }}
-        sx={{ border: 0 }}
       />
     </Paper>
   );
@@ -262,71 +295,71 @@ const columns = [
     renderCell: (params) => RenderUserActionMenu(params),
   },
 ];
-const rows = [
-  {
-    id: 1,
-    email: 'john.doe@example.com',
-    pictureUrl:
-      'https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg',
-    firstName: 'John',
-    lastName: 'Doe',
-    contactNo: '+1234567890',
-    role: 'Admin',
-    department: 'IT',
-    status: 'Active',
-    createdAt: '2024-01-01T10:00:00Z',
-    lastActive: '2024-12-25T15:45:00Z',
-  },
-  {
-    id: 2,
-    email: 'jane.smith@example.com',
-    pictureUrl: 'https://example.com/images/jane.jpg',
-    firstName: 'Jane',
-    lastName: 'Smith',
-    contactNo: '+1987654321',
-    role: 'Doctor',
-    department: 'Pediatrics',
-    status: 'Inactive',
-    createdAt: '2023-06-15T09:30:00Z',
-    lastActive: '2024-06-12T14:20:00Z',
-  },
-  {
-    id: 3,
-    email: 'alex.jones@example.com',
-    pictureUrl: 'https://example.com/images/alex.jpg',
-    firstName: 'Alex',
-    lastName: 'Jones',
-    contactNo: '+1122334455',
-    role: 'Nurse',
-    department: 'Emergency',
-    status: 'Active',
-    createdAt: '2023-12-01T08:15:00Z',
-    lastActive: '2024-12-20T10:00:00Z',
-  },
-  {
-    id: 4,
-    email: 'chris.lee@example.com',
-    pictureUrl: 'https://example.com/images/chris.jpg',
-    firstName: 'Chris',
-    lastName: 'Lee',
-    contactNo: '+1223344556',
-    role: 'Lab Technician',
-    department: 'Laboratory',
-    status: 'Active',
-    createdAt: '2022-11-20T11:45:00Z',
-    lastActive: '2024-11-30T16:30:00Z',
-  },
-  {
-    id: 5,
-    email: 'maria.garcia@example.com',
-    pictureUrl: 'https://example.com/images/maria.jpg',
-    firstName: 'Maria',
-    lastName: 'Garcia',
-    contactNo: '+1445566778',
-    role: 'Receptionist',
-    department: 'Front Desk',
-    status: 'Inactive',
-    createdAt: '2021-05-05T07:00:00Z',
-    lastActive: '2023-10-25T12:00:00Z',
-  },
-];
+// const rows = [
+//   {
+//     id: 1,
+//     email: 'john.doe@example.com',
+//     pictureUrl:
+//       'https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg',
+//     firstName: 'John',
+//     lastName: 'Doe',
+//     contactNo: '+1234567890',
+//     role: 'Admin',
+//     department: 'IT',
+//     status: 'Active',
+//     createdAt: '2024-01-01T10:00:00Z',
+//     lastActive: '2024-12-25T15:45:00Z',
+//   },
+//   {
+//     id: 2,
+//     email: 'jane.smith@example.com',
+//     pictureUrl: 'https://example.com/images/jane.jpg',
+//     firstName: 'Jane',
+//     lastName: 'Smith',
+//     contactNo: '+1987654321',
+//     role: 'Doctor',
+//     department: 'Pediatrics',
+//     status: 'Inactive',
+//     createdAt: '2023-06-15T09:30:00Z',
+//     lastActive: '2024-06-12T14:20:00Z',
+//   },
+//   {
+//     id: 3,
+//     email: 'alex.jones@example.com',
+//     pictureUrl: 'https://example.com/images/alex.jpg',
+//     firstName: 'Alex',
+//     lastName: 'Jones',
+//     contactNo: '+1122334455',
+//     role: 'Nurse',
+//     department: 'Emergency',
+//     status: 'Active',
+//     createdAt: '2023-12-01T08:15:00Z',
+//     lastActive: '2024-12-20T10:00:00Z',
+//   },
+//   {
+//     id: 4,
+//     email: 'chris.lee@example.com',
+//     pictureUrl: 'https://example.com/images/chris.jpg',
+//     firstName: 'Chris',
+//     lastName: 'Lee',
+//     contactNo: '+1223344556',
+//     role: 'Lab Technician',
+//     department: 'Laboratory',
+//     status: 'Active',
+//     createdAt: '2022-11-20T11:45:00Z',
+//     lastActive: '2024-11-30T16:30:00Z',
+//   },
+//   {
+//     id: 5,
+//     email: 'maria.garcia@example.com',
+//     pictureUrl: 'https://example.com/images/maria.jpg',
+//     firstName: 'Maria',
+//     lastName: 'Garcia',
+//     contactNo: '+1445566778',
+//     role: 'Receptionist',
+//     department: 'Front Desk',
+//     status: 'Inactive',
+//     createdAt: '2021-05-05T07:00:00Z',
+//     lastActive: '2023-10-25T12:00:00Z',
+//   },
+// ];

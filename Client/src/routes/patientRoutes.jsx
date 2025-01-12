@@ -2,7 +2,7 @@ import {} from 'react';
 
 import { Navigate, Outlet } from 'react-router-dom';
 import img from '../assets/Wallpapers/close-up-stethoscope-blank-blue-background.jpg';
-import PatientHeaderbar from '../components/Patient/PatientHeaderbar';
+import PatientHeaderbar from 'layouts/PatientDashboard/PatientHeaderbar';
 import AvailabilityCheckLayout from '../pages/patientPortal/components/patient_visits/Desktop/AvailabilityCheckLayout';
 import { Grid2 } from '@mui/material';
 
@@ -34,7 +34,6 @@ const patientRoutes = {
       element: (
         <>
           <AvailabilityCheckLayout />
-          <Outlet />
         </>
       ),
       children: [

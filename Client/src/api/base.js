@@ -40,4 +40,4 @@ export async function apiFetch(
 }
 
 // Using Axios
-export const apiAxios = axios.create({ baseURL: testApiUrl }); //create Axios instance with the base URL, can use timeout, headers, etc
+export const apiAxios = axios.create({ baseURL: baseApiUrl }); //create Axios instance with the base URL, can use timeout, headers, etc

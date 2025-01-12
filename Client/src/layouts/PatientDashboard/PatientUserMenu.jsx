@@ -1,16 +1,16 @@
-import React from "react";
-import IconButton from "@mui/material/IconButton";
-import Button from "@mui/material/Button";
-import Avatar from "@mui/material/Avatar";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import Tooltip from "@mui/material/Tooltip";
-import Badge from "@mui/material/Badge";
+import React from 'react';
+import IconButton from '@mui/material/IconButton';
+import Button from '@mui/material/Button';
+import Avatar from '@mui/material/Avatar';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Tooltip from '@mui/material/Tooltip';
+import Badge from '@mui/material/Badge';
 
-import Grid from "@mui/material/Grid2";
+import Grid from '@mui/material/Grid2';
 
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import LogoutIcon from "@mui/icons-material/Logout";
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import LogoutIcon from '@mui/icons-material/Logout';
 //import { Link, NavLink } from "react-router-dom";
 
 const UserMenu = ({ isLoggedIn, user, onLogout }) => {
@@ -40,7 +40,7 @@ const UserMenu = ({ isLoggedIn, user, onLogout }) => {
                 badgeContent={4}
                 color="error"
                 sx={{
-                  "& .MuiBadge-badge": {
+                  '& .MuiBadge-badge': {
                     fontSize: 9,
                     height: 14,
                     minWidth: 13,
@@ -50,16 +50,12 @@ const UserMenu = ({ isLoggedIn, user, onLogout }) => {
                 <NotificationsIcon fontSize="small" />
               </Badge>
             </IconButton>
-          </Tooltip>{" "}
+          </Tooltip>{' '}
         </Grid>
         <Grid item>
           <Tooltip title="Profile">
             <IconButton onClick={handleMenuOpen} color="inherit">
-              <Avatar
-                alt={user.name}
-                src={user.profilePic}
-                sx={{ width: 25, height: 25 }}
-              />
+              <Avatar alt={user.name} src={user.profilePic} sx={{ width: 25, height: 25 }} />
             </IconButton>
           </Tooltip>
         </Grid>
@@ -68,8 +64,8 @@ const UserMenu = ({ isLoggedIn, user, onLogout }) => {
           open={open}
           onClose={handleMenuClose}
           anchorOrigin={{
-            vertical: "top",
-            horizontal: "right",
+            vertical: 'top',
+            horizontal: 'right',
           }}
         >
           <MenuItem onClick={onLogout}>
@@ -77,7 +73,7 @@ const UserMenu = ({ isLoggedIn, user, onLogout }) => {
             &nbsp; Logout
           </MenuItem>
           <MenuItem>Hello</MenuItem>
-        </Menu>{" "}
+        </Menu>{' '}
       </Grid>
     </div>
   ) : (

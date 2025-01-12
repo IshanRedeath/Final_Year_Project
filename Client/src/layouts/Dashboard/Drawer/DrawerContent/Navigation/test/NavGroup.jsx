@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
 // project import
-import NavItem from './NavItem';
+import NavItem from '../NavItem';
 import { useMenu } from 'context/dashboardMenuContext';
 
 export default function NavGroup({ item }) {
@@ -37,7 +37,7 @@ export default function NavGroup({ item }) {
       subheader={
         item.title &&
         drawerOpen && (
-          <Box sx={{ pl: 3, mb: 1.5 }}>
+          <Box sx={{ pl: 3, mb: 1.5, mt: 1.5 }}>
             <Typography variant="subtitle2" color="textSecondary">
               {item.title}
             </Typography>
@@ -45,7 +45,7 @@ export default function NavGroup({ item }) {
           </Box>
         )
       }
-      sx={{ mb: drawerOpen ? 1.5 : 0, py: 0, zIndex: 0 }}
+      sx={{ py: 0, zIndex: 0 }}
     >
       {navCollapse}
     </List>

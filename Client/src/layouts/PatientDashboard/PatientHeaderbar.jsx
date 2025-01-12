@@ -1,20 +1,25 @@
+//Mui components
 import React, { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import AppBar from '@mui/material/AppBar';
 import Grid from '@mui/material/Grid2';
 import Toolbar from '@mui/material/Toolbar';
 import Box from '@mui/material/Box';
-import { Typography, useMediaQuery } from '@mui/material';
-import HomeWorkTwoToneIcon from '@mui/icons-material/HomeWorkTwoTone';
+import { useMediaQuery } from '@mui/material';
+import Typography from '@mui/material/Typography';
 import Slide from '@mui/material/Slide';
-import UserMenu from '../Common/Header/UserMenu';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
+
+//Mui Icons
 import PendingActionsTwoToneIcon from '@mui/icons-material/PendingActionsTwoTone';
 import MailTwoToneIcon from '@mui/icons-material/MailTwoTone';
 import ScienceTwoToneIcon from '@mui/icons-material/ScienceTwoTone';
 import HealingTwoToneIcon from '@mui/icons-material/HealingTwoTone';
-
+import HomeWorkTwoToneIcon from '@mui/icons-material/HomeWorkTwoTone';
+//My Headerbar Components
+import UserMenu from './PatientUserMenu';
+//React Router lib
 import { useLocation, useNavigate } from 'react-router-dom';
 const iconProps = { fontSize: { xs: 35, md: 35 } };
 
@@ -80,9 +85,7 @@ const Navigation = ({ showLabel }) => {
 function PatientNavigation() {
   const isMobile = useMediaQuery('only screen and (max-width : 550px)');
 
-  return (
-    <>{isMobile ? <Navigation showLabel={false} /> : <Navigation showLabel={true} />}</>
-  );
+  return <>{isMobile ? <Navigation showLabel={false} /> : <Navigation showLabel={true} />}</>;
 }
 
 export default function PatientHeaderbar() {
@@ -128,11 +131,7 @@ export default function PatientHeaderbar() {
   }, [lastScrollY]);
 
   return (
-    <Slide
-      in={isMobile ? scrollDirection === 'up' : true}
-      appear={false}
-      direction="down"
-    >
+    <Slide in={isMobile ? scrollDirection === 'up' : true} appear={false} direction="down">
       <AppBar
         sx={{
           justifyContent: 'center',

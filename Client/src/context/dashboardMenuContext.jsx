@@ -6,13 +6,20 @@ const MenuContext = createContext();
 // Initial State
 const initialState = {
   openedItem: 'dashboard',
+  openedItem2: '',
   isDashboardDrawerOpened: false,
 };
 
 // Provider Component
 export const MenuProvider = ({ children }) => {
   const [menuState, setMenuState] = useState(initialState);
-
+  // Function to handle active submenu item
+  const handlerActiveItem2 = (id) => {
+    setMenuState((prevState) => ({
+      ...prevState,
+      openedItem2: id,
+    }));
+  };
   // Function to handle active menu item
   const handlerActiveItem = (id) => {
     setMenuState((prevState) => ({
@@ -26,7 +33,7 @@ export const MenuProvider = ({ children }) => {
   };
 
   return (
-    <MenuContext.Provider value={{ menuState, handlerActiveItem, handlerDrawerOpen }}>
+    <MenuContext.Provider value={{ menuState, handlerActiveItem, handlerActiveItem2, handlerDrawerOpen }}>
       {children}
     </MenuContext.Provider>
   );

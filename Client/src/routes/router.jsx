@@ -10,7 +10,7 @@ import adminRoutes from './adminRoutes';
 import doctorRoutes from './doctorRoutes';
 import patientRoutes from './patientRoutes';
 import SessionRedirect from './SessionRedirect';
-import PatientHeaderBar from '../components/Patient/PatientHeaderbar';
+import PatientHeaderBar from '../layouts/PatientDashboard/PatientHeaderbar';
 import RouteAuth from './RouteAuth';
 import Login from '../pages/patientPortal/Login';
 import { useEffect } from 'react';

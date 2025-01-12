@@ -10,11 +10,13 @@ const icons = {
 
 const dashboard = {
   id: 'group-dashboard',
-  title: 'Navigation',
-  type: 'group',
+  title: 'Dashboard',
+  type: 'item',
+  url: '/admin-dashboard',
+  icon: icons.SpeedOutlinedIcon,
   children: [
     {
-      id: 'dashboard',
+      id: 'admindashboard',
       title: 'Dashboard',
       type: 'item',
       url: '/admin-dashboard',

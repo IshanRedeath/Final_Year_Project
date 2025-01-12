@@ -26,7 +26,7 @@ const closedMixin = (theme) => ({
   }),
 
   overflowX: 'hidden',
-  width: 70,
+  width: 60,
   borderRight: 'none',
   boxShadow: theme.customShadows.z1,
 });

@@ -37,7 +37,7 @@ export default function NavItem({ item, level }) {
   }
 
   const Icon = item.icon;
-  const itemIcon = item.icon ? <Icon style={{ fontSize: drawerOpen ? '1rem' : '1.25rem' }} /> : false;
+  const itemIcon = item.icon ? <Icon style={{ fontSize: drawerOpen ? '1rem' : '1.45rem' }} /> : false;
 
   const { pathname } = useLocation();
   // Split the pathname into segments
@@ -67,6 +67,7 @@ export default function NavItem({ item, level }) {
       selected={isSelected}
       sx={{
         zIndex: 1201,
+
         pl: drawerOpen ? `${level * 28}px` : 1.5,
         py: !drawerOpen && level === 1 ? 1.25 : 1,
         ...(drawerOpen && {
@@ -123,7 +124,16 @@ export default function NavItem({ item, level }) {
           {itemIcon}
         </ListItemIcon>
       )}
-      {(drawerOpen || (!drawerOpen && level !== 1)) && (
+      {/* {(drawerOpen || (!drawerOpen && level !== 1)) && (
+        <ListItemText
+          primary={
+            <Typography variant="h6" sx={{ color: isSelected ? iconSelectedColor : textColor }}>
+              {item.title}
+            </Typography>
+          }
+        />
+      )} */}
+      {drawerOpen && (
         <ListItemText
           primary={
             <Typography variant="h6" sx={{ color: isSelected ? iconSelectedColor : textColor }}>

@@ -25,6 +25,7 @@ import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
+import CustomScrollBarBox from 'components/Common/SimpleScrollBar';
 
 //Visits types select grids view
 function SelectVisitType() {
@@ -106,7 +107,6 @@ function SearchDoctor({ closeFunction }) {
             width: '100%',
             padding: 2,
             margin: 'auto',
-            borderRight: '1px solid #ccc',
           }}
         >
           {/* Autocomplete for Searching Doctor */}
@@ -115,9 +115,7 @@ function SearchDoctor({ closeFunction }) {
             getOptionLabel={(option) => option.label}
             value={selectedDoctor}
             onChange={(event, newValue) => setSelectedDoctor(newValue)}
-            renderInput={(params) => (
-              <TextField {...params} label="Search Doctor" variant="outlined" />
-            )}
+            renderInput={(params) => <TextField {...params} label="Search Doctor" variant="outlined" />}
           />
 
           {/* Autocomplete for Specialties */}
@@ -126,9 +124,7 @@ function SearchDoctor({ closeFunction }) {
             //getOptionLabel={(option) => option.label}
             value={selectedSpecialty}
             onChange={(event, newValue) => setSelectedSpecialty(newValue)}
-            renderInput={(params) => (
-              <TextField {...params} label="Search Specialty" variant="outlined" />
-            )}
+            renderInput={(params) => <TextField {...params} label="Search Specialty" variant="outlined" />}
           />
 
           {/* Date Picker */}
@@ -143,12 +139,7 @@ function SearchDoctor({ closeFunction }) {
           />
 
           {/* Submit Button */}
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            onClick={closeFunction}
-          >
+          <Button type="submit" variant="contained" color="primary" onClick={closeFunction}>
             Search
           </Button>
         </Box>
@@ -178,13 +169,13 @@ export default function AvailabilityCheckLayout() {
     }
   };
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={2} sx={{ maxHeight: '100vh', overflow: 'hidden' }}>
       {/* Serach Heading component start */}
       <Grid
         item
-        size={{ xs: 12 }}
+        size={{ xs: 12, maxHeight: '10vh' }}
         sx={{
-          position: 'sticky',
+          position: 'static',
           top: 0,
           zIndex: 10, // Ensure it stays above other content if needed
           backgroundColor: 'white', // Prevent content overlap
@@ -240,25 +231,27 @@ export default function AvailabilityCheckLayout() {
       <Grid
         item
         size={{ lg: 3, xl: 2 }}
+        // sx={{ display: { xs: 'none', lg: 'block' }, maxHeight: '70vh' }}
         sx={{
           display: { xs: 'none', lg: 'block' },
-          height: '80vh',
-          overflowY: 'auto',
-          border: '1px solid #ccc',
-          borderRadius: 5,
-          '&::-webkit-scrollbar': {
-            width: 6,
-          },
-          '&::-webkit-scrollbar-thumb': {
-            backgroundColor: '#888',
-            borderRadius: 2,
-          },
-          '&::-webkit-scrollbar-thumb:hover': {
-            backgroundColor: '#555',
-          },
+          overflowY: 'auto', // Enable individual scrolling
+          maxHeight: 'calc(100vh - 64px)', // Subtract header height
         }}
+        //   '&::-webkit-scrollbar': {
+        //     width: 6,
+        //   },
+        //   '&::-webkit-scrollbar-thumb': {
+        //     backgroundColor: '#888',
+        //     borderRadius: 2,
+        //   },
+        //   '&::-webkit-scrollbar-thumb:hover': {
+        //     backgroundColor: '#555',
+        //   },
+        // }}
       >
-        <SearchDoctor />
+        <CustomScrollBarBox sx={{ maxHeight: 'calc(100vh - 130px)' }}>
+          <SearchDoctor /> <SearchDoctor />
+        </CustomScrollBarBox>
       </Grid>
       {/* Ends */}
 
@@ -267,12 +260,12 @@ export default function AvailabilityCheckLayout() {
         item
         size={{ lg: 9, xl: 10 }}
         sx={{
+          overflowY: 'auto',
           overflowX: { xs: 'none', lg: 'auto' },
-          height: { xs: 'auto', lg: '100vh' },
+          maxHeight: { xs: 'auto', lg: 'calc(100vh - 130px)' },
         }}
       >
-        <SelectVisitType /> <SelectVisitType /> <SelectVisitType /> <SelectVisitType />{' '}
-        <SelectVisitType />
+        <SelectVisitType /> <SelectVisitType /> <SelectVisitType /> <SelectVisitType /> <SelectVisitType />
       </Grid>
       {/* Section Ends */}
     </Grid>

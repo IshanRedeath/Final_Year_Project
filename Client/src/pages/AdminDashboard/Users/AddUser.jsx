@@ -3,30 +3,57 @@ import UserForm from './UserForm';
 import { redirect, useActionData, useLoaderData, useNavigation } from 'react-router-dom';
 import CustomForm from 'components/Common/CustomForm';
 import { max } from 'lodash';
+import EmailTwoToneIcon from '@mui/icons-material/EmailTwoTone';
+import { InputAdornment } from '@mui/material';
 const defaultValues = {
   username: 'Ishan',
   email: 'jsdjg@gasg',
-  bd: '2222-12-12',
+  bd: '2024-12-12',
   password: 'sdfsdf',
   gender: 'female',
   checkbox: ['option1'],
   selectedRoles1: ['Admin', 'receptionist'],
-  selectedRoles2: ['Admin'],
+  selectedRoles2: 'Admin',
   selectedRoles3: [{ name: 'Admin' }, { name: 'doctor' }],
   selectedRoles4: { name: 'Admin' },
 };
 const elements = [
-  { field: 'textInput', id: 'username', label: 'Username', required: true, props: {} },
-  { field: 'textInput', id: 'email', label: 'Email', required: true, props: {} },
   {
-    field: 'textInput',
+    type: 'text',
+    pattern: '^[A-Za-z]+(?: [A-Za-z]+)*$',
+    errorText: 'Only Alphabets and spaces are allowed',
+    id: 'username',
+    label: 'Username',
+    required: true,
+    props: {},
+    inputAdornment: 'FullName',
+  },
+  {
+    type: 'text',
+    id: 'email',
+    label: 'Email',
+    required: true,
+    props: {},
+    inputAdornment: <EmailTwoToneIcon />,
+  },
+  {
+    type: 'file',
+    id: 'file',
+    label: 'File Upload',
+    options: { multiple: true, onChange: (e) => console.log(e.target.files) },
+
+    props: {},
+    inputAdornment: <EmailTwoToneIcon />,
+  },
+  {
     type: 'date',
     id: 'bd',
     label: 'Birth Date',
     required: true,
+    // inputProps: { inputProps: { min: '2003-12-31', max: '2025-10-1' } },
   },
   {
-    field: 'checkbox',
+    type: 'checkbox',
     id: 'checkbox',
     label: 'Checkbox',
     required: true,
@@ -36,11 +63,20 @@ const elements = [
     ],
   },
   {
-    field: 'textInput',
+    type: 'number',
+    id: 'number',
+    label: 'Number',
+    // required: true,
+    inputAdornment: <EmailTwoToneIcon />,
+    inputProps: { inputProps: { max: 10 } },
+  },
+  {
     type: 'password',
     id: 'password',
     label: 'Password',
     required: true,
+    props: { confirmPassword: true },
+
     //props: { multiline: true, maxRows: 3 },
   },
   // {
@@ -53,7 +89,7 @@ const elements = [
   //   props: {},
   // },
   {
-    field: 'radio',
+    type: 'radio',
     id: 'gender',
     label: 'Gender',
     required: true,
@@ -64,7 +100,7 @@ const elements = [
   },
 
   {
-    field: 'select',
+    type: 'select',
     id: 'selectedRoles1',
     label: 'Roles1',
     required: true,
@@ -72,7 +108,7 @@ const elements = [
     options: ['Admin', 'receptionist', 'doctor', 'nurse'],
   },
   {
-    field: 'select',
+    type: 'select',
     id: 'selectedRoles2',
     label: 'Roles2',
     required: true,
@@ -80,7 +116,7 @@ const elements = [
     options: ['Admin', 'receptionist', 'doctor', 'nurse'],
   },
   {
-    field: 'objectSelect',
+    type: 'objectSelect',
     id: 'selectedRoles3',
     label: 'Roles3',
     required: true,
@@ -89,7 +125,7 @@ const elements = [
     options: [{ name: 'Admin' }, { name: 'receptionist' }, { name: 'doctor' }, { name: 'nurse' }],
   },
   {
-    field: 'objectSelect',
+    type: 'objectSelect',
     id: 'selectedRoles4',
     label: 'Roles4',
     required: true,
@@ -112,7 +148,7 @@ export default function AddUser() {
         id="addUsers"
         name="Add User Form"
         //ssd
-        //defaultValues={defaultValues}
+        defaultValues={defaultValues}
       />
     </div>
   );

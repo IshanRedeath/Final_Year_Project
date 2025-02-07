@@ -1,6 +1,8 @@
 const express = require("express");
+const bodyParser = require("body-parser");
 const cors = require("cors");
 const userRouter = require("./routes/userRoutes");
+const testRouter = require("./routes/testRoutes");
 const app = express();
 
 // const http = require("http");
@@ -22,7 +24,9 @@ const corsOptions = {
   credentials: true,
   optionsSuccessStatus: 204,
 };
+app.use(bodyParser.json());
 app.use(cors(corsOptions));
 app.use("/users", userRouter);
+app.use("/tests", testRouter);
 
 module.exports = app;

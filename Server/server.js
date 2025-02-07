@@ -6,6 +6,7 @@ const app = require("./app");
 // eslint-disable-next-line no-undef
 const PORT = process.env.PORT;
 mongoose
+  // eslint-disable-next-line no-undef
   .connect(process.env.DATABASE_URL)
   .then(() => {
     console.log("Database connected successfully.");

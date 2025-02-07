@@ -1,11 +1,10 @@
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 // MUI components
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
-
 import Autocomplete from '@mui/material/Autocomplete';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid2';
@@ -15,14 +14,49 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import FormGroup from '@mui/material/FormGroup';
+import FormHelperText from '@mui/material/FormHelperText';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
+import Divider from '@mui/material/Divider';
+
+//mui Icons
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 import { Form } from 'react-router-dom';
 
-function renderElement(element, value, handleInputChange) {
-  const { field, type, id, label, options, optionLabel, required, props } = element;
+//import Form necessary functions
+import { detectChanges, validate } from './CustomFormFunctions';
 
-  switch (field) {
-    case 'textInput':
+function RenderElement(element, value, handleInputChange, setErrors, errors) {
+  const { inputAdornment, type, id, label, options, optionLabel, required, props, inputProps } = element;
+
+  //dedicated for password and confirmPassword fields..
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [password, setPassword] = useState('');
+  useEffect(() => {
+    handleConfirmPasswordValidate();
+  }, [password, confirmPassword]); //whenever password or confirmPassword changes, validate the password
+  const handleConfirmPasswordValidate = () => {
+    if (confirmPassword !== password) {
+      //check wether the password and confirmPassword are same
+      console.log('Password does not match');
+      setErrors({ ...errors, confirmPassword: 'Password does not match' });
+    } else {
+      setErrors({ ...errors, confirmPassword: '' });
+    }
+  };
+  //=========================================================
+
+  const handleFileChange = (event) => {
+    const files = event.target.files;
+    options.onChange({ target: { value: options.multiple ? Array.from(files) : files[0] } });
+  };
+
+  switch (type) {
+    case 'text':
       return (
         <TextField
           {...props}
@@ -33,21 +67,165 @@ function renderElement(element, value, handleInputChange) {
           name={id}
           fullWidth
           slotProps={{
-            inputLabel: type === 'date' ? { shrink: 'true' } : {},
+            input: {
+              ...inputProps,
+              endAdornment: (
+                <InputAdornment
+                  position="end"
+                  sx={{
+                    //width: 'auto',
+                    display: 'flex',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {/* <Divider orientation="vertical" variant="middle" flexItem /> */}
+                  {inputAdornment}
+                </InputAdornment>
+              ),
+            },
           }}
           required={required}
           defaultValue={value || ''}
           onBlur={(e) => handleInputChange(e, id)}
+          //onFocus={setErrors({ ...errors, [id]: '' })}
+          error={errors[id] || false}
+          helperText={errors[id] || ''}
+        />
+      );
+    case 'password':
+      return (
+        <Grid>
+          <TextField
+            sx={{ mb: 2 }}
+            {...props}
+            id={id}
+            type={showPassword ? 'text' : 'password'}
+            label={label}
+            size="small"
+            name={id}
+            fullWidth
+            slotProps={{
+              input: {
+                ...inputProps,
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label={showPassword ? 'hide the password' : 'display the password'}
+                      onClick={() => setShowPassword(!showPassword)}
+                      onMouseDown={(e) => e.preventDefault()} // avoid default behavours which cause issues ,submission of form,focus on input field,unwanted side effects
+                      onMouseUp={(e) => e.preventDefault()}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
+            }}
+            required={required}
+            defaultValue={value || ''}
+            onBlur={(e) => {
+              handleInputChange(e, id);
+            }}
+            onChange={(e) => {
+              setPassword(e.target.value);
+            }}
+            //onFocus={setErrors({ ...errors, [id]: '' })}
+            error={errors[id] || false}
+            helperText={errors[id] || ''}
+          />
+          {props.confirmPassword && (
+            <TextField
+              {...props}
+              //id={id}
+              type={showConfirmPassword ? 'text' : 'password'}
+              label={`Confirm ${label}`}
+              size="small"
+              name={id}
+              fullWidth
+              slotProps={{
+                input: {
+                  ...inputProps,
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label={showConfirmPassword ? 'hide the password' : 'display the password'}
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        onMouseDown={(e) => e.preventDefault()} // avoid default behavours which cause issues ,submission of form,focus on input field,unwanted side effects
+                        onMouseUp={(e) => e.preventDefault()}
+                        edge="end"
+                      >
+                        {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }}
+              required={required}
+              onChange={(e) => {
+                setConfirmPassword(e.target.value);
+              }}
+              error={errors.confirmPassword || false}
+              helperText={errors.confirmPassword || ''}
+            />
+          )}
+        </Grid>
+      );
+
+    case 'number':
+      return (
+        <TextField
+          {...props}
+          id={id}
+          type="number"
+          label={label}
+          size="small"
+          name={id}
+          fullWidth
+          required={required}
+          defaultValue={value || ''}
+          //onFocus={setErrors({ ...errors, [id]: '' })}
+          onBlur={(e) => handleInputChange(e, id)}
+          slotProps={{
+            input: {
+              ...inputProps,
+
+              endAdornment: <InputAdornment position="end">{inputAdornment}</InputAdornment>,
+            },
+          }}
+          error={errors[id] || false}
+          helperText={errors[id] || ''}
         />
       );
 
+    //TODO: Complete the date component min and max values Or add mui date picker lib
+    case 'date':
+      return (
+        <TextField
+          {...props}
+          id={id}
+          type="date"
+          label={label}
+          size="small"
+          name={id}
+          fullWidth
+          required={required}
+          defaultValue={value || ''}
+          slotProps={{ inputLabel: { shrink: true }, inputProps: { min: '2003-12-31', max: '2025-10-1' } }}
+          onBlur={(e) => handleInputChange(e, id)}
+          error={errors[id] || false}
+          helperText={errors[id] || ''}
+        />
+      );
     case 'radio':
       return (
-        <Box display="flex" alignItems="center">
-          <FormLabel id={`${id}-group-label`} style={{ marginRight: '16px' }}>
-            {label}
-          </FormLabel>
-          <FormControl>
+        <Box display="flex" alignItems="center" maxHeight="auto">
+          <FormControl error={errors[id] || false}>
+            <FormLabel id={`${id}-group-label`} style={{ marginRight: '16px', marginLeft: '2px' }}>
+              {label}
+              {required == true ? '*' : null}
+            </FormLabel>
+
             <RadioGroup
               row
               aria-labelledby={`${id}-group-label`}
@@ -64,6 +242,7 @@ function renderElement(element, value, handleInputChange) {
                 />
               ))}
             </RadioGroup>
+            {errors[id] && <FormHelperText>{errors[id]}</FormHelperText>}
           </FormControl>
         </Box>
       );
@@ -71,8 +250,11 @@ function renderElement(element, value, handleInputChange) {
     case 'checkbox':
       return (
         <Box display="flex" alignItems="start">
-          <FormControl component="fieldset">
-            <FormLabel component="legend">{label}</FormLabel>
+          <FormControl component="fieldset" error={errors[id] || false}>
+            <FormLabel component="legend">
+              {label}
+              {required == true ? '*' : null}
+            </FormLabel>
             <FormGroup row>
               {options.map((option) => (
                 <FormControlLabel
@@ -88,6 +270,8 @@ function renderElement(element, value, handleInputChange) {
                 />
               ))}
             </FormGroup>
+
+            {errors[id] && <FormHelperText>{errors[id]}</FormHelperText>}
           </FormControl>
         </Box>
       );
@@ -98,6 +282,7 @@ function renderElement(element, value, handleInputChange) {
           id={id}
           {...props}
           size="small"
+          required={required}
           options={options}
           value={value || (props?.multiple ? [] : null)}
           onChange={(e, value) => handleInputChange({ target: { value } }, id)}
@@ -114,7 +299,9 @@ function renderElement(element, value, handleInputChange) {
             return options; // No filtering needed for single selection
           }}
           //filterSelectedOptions={props?.multiple}
-          renderInput={(params) => <TextField {...params} label={label} />}
+          renderInput={(params) => (
+            <TextField {...params} label={label} error={errors[id] || false} helperText={errors[id] || ''} />
+          )}
         />
       );
     case 'select':
@@ -123,6 +310,7 @@ function renderElement(element, value, handleInputChange) {
           id={id}
           {...props}
           size="small"
+          required={required}
           onChange={(e, selectedValue) => {
             handleInputChange({ target: { value: selectedValue } }, id);
           }}
@@ -130,8 +318,53 @@ function renderElement(element, value, handleInputChange) {
           options={options}
           value={value || (props?.multiple ? [] : '')}
           filterSelectedOptions
-          renderInput={(params) => <TextField {...params} label={label} />}
+          renderInput={(params) => (
+            <TextField {...params} label={label} error={errors[id] || false} helperText={errors[id] || ''} />
+          )}
         />
+      );
+    //TODO: complete the file upload component
+    case 'file':
+      return (
+        <Box>
+          <TextField
+            id={id}
+            label={label}
+            value={
+              value ? (Array.isArray(value) ? value.map((file) => file.name).join(', ') : value.name) : ''
+            }
+            fullWidth
+            size="small"
+            slotProps={{
+              input: {
+                readOnly: true, // Make it read-only since it's not a regular text input
+                endAdornment: (
+                  <Button variant="contained" component="label" size="small">
+                    Browse
+                    <input
+                      type="file"
+                      hidden
+                      multiple={options.multiple}
+                      accept="image/*"
+                      onChange={handleFileChange}
+                    />
+                  </Button>
+                ),
+              },
+            }}
+          />
+          {value && (
+            <Box mt={1}>
+              {Array.isArray(value)
+                ? value.map((file, index) => (
+                    <Typography key={index} variant="body2">
+                      {file.name}
+                    </Typography>
+                  ))
+                : value.name && <Typography variant="body2">{value.name}</Typography>}
+            </Box>
+          )}
+        </Box>
       );
     default:
       return null;
@@ -141,18 +374,20 @@ function renderElement(element, value, handleInputChange) {
 export default function CustomForm(props) {
   const { elements, id, name, defaultValues } = props;
   const initialFormData = elements.reduce(
+    //initialize the form data with default values
     (acc, element) => ({
-      ...acc,
-      [element.id]: defaultValues?.[element.id] ?? '',
+      //map the elements array to an object with the element id as key and the defaultValue as value and accumilate them to retun at once
+      ...acc, //function's accumilated results
+      [element.id]: defaultValues?.[element.id] ?? '', //check whether the default value exists respective to elemnt id and if not set it to an empty string
     }),
     {},
   );
-
+  const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState(initialFormData);
 
   const handleInputChange = (event, fieldId, isCheckbox = false) => {
     const { value, checked } = event.target;
-
+    setErrors((prev) => ({ ...prev, [fieldId]: '' })); //remove errors onFocus out
     setFormData((prev) => {
       if (isCheckbox) {
         return {
@@ -169,9 +404,19 @@ export default function CustomForm(props) {
       };
     });
   };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(formData);
+    const errors = validate(formData, elements);
+    console.log(errors);
+    if (errors) {
+      return setErrors((prevErrors) => ({ ...prevErrors, ...errors }));
+    }
+    if (defaultValues) {
+      const newChanges = detectChanges(formData, defaultValues);
+      console.log(newChanges); // Display the changes
+    }
   };
 
   return (
@@ -183,10 +428,10 @@ export default function CustomForm(props) {
         {elements.map((element) => (
           <Grid
             item
-            size={{ xs: 12, md: element.field === 'radio' || element.field === 'checkbox' ? 12 : 6 }}
+            size={{ xs: 12, md: element.type === 'radio' || element.type === 'checkbox' ? 12 : 6 }}
             key={element.id}
           >
-            {renderElement(element, formData[element.id], handleInputChange)}
+            {RenderElement(element, formData[element.id], handleInputChange, setErrors, errors)}
           </Grid>
         ))}
         <Grid item container size={{ xs: 12 }}>
@@ -205,156 +450,3 @@ export default function CustomForm(props) {
     </Box>
   );
 }
-
-// import PropTypes from 'prop-types';
-// import React, { useState } from 'react';
-// // MUI components
-// import Box from '@mui/material/Box';
-// import TextField from '@mui/material/TextField';
-// import Button from '@mui/material/Button';
-// import Checkbox from '@mui/material/Checkbox';
-
-// import Autocomplete from '@mui/material/Autocomplete';
-// import Typography from '@mui/material/Typography';
-// import Grid from '@mui/material/Grid2';
-// import Radio from '@mui/material/Radio';
-// import RadioGroup from '@mui/material/RadioGroup';
-// import FormControlLabel from '@mui/material/FormControlLabel';
-// import FormControl from '@mui/material/FormControl';
-// import FormLabel from '@mui/material/FormLabel';
-// import FormGroup from '@mui/material/FormGroup';
-
-// import { Form } from 'react-router-dom';
-
-// function renderElement(element, value, setFormData) {
-//   const handleCheckboxChange = (event, fieldId) => {
-//     const { value, checked } = event.target;
-//     setFormData((prev) => ({
-//       ...prev,
-//       [fieldId]: checked ? [...(prev[fieldId] || []), value] : prev[fieldId].filter((item) => item !== value),
-//     }));
-//   };
-
-//   const { field, type, id, label, options, required, props } = element;
-//   switch (field) {
-//     case 'textInput':
-//       return (
-//         <TextField
-//           {...props}
-//           id={id}
-//           type={type}
-//           label={label}
-//           size="small"
-//           name={id}
-//           fullWidth
-//           required={required}
-//           defaultValue={value}
-//           slotProps={{
-//             inputLabel: type === 'date' ? { shrink: 'true' } : {},
-//           }}
-//         />
-//       );
-//     case 'radio':
-//       return (
-//         <Box display="flex" alignItems="center">
-//           <FormLabel id="buttons-group-label" style={{ marginRight: '16px' }}>
-//             {label}
-//           </FormLabel>
-//           <FormControl>
-//             <RadioGroup row aria-labelledby="buttons-group-label" name={id} defaultValue={value}>
-//               {options.map((option) => (
-//                 <FormControlLabel
-//                   key={option.name}
-//                   value={option.value}
-//                   control={<Radio />}
-//                   label={option.name}
-//                 />
-//               ))}
-//             </RadioGroup>
-//           </FormControl>
-//         </Box>
-//       );
-
-//     case 'checkbox':
-//       return (
-//         <Box display="flex" alignItems="start">
-//           <FormControl component="fieldset">
-//             <FormLabel component="legend">{label}</FormLabel>
-//             <FormGroup row defaultChecked="option1">
-//               {options.map((option) => (
-//                 <FormControlLabel
-//                   key={option.name}
-//                   control={
-//                     <Checkbox
-//                       checked={value?.includes(option.value)}
-//                       value={option.value}
-//                       onChange={(e) => handleCheckboxChange(e, id)}
-//                     />
-//                   }
-//                   label={option.name}
-//                 />
-//               ))}
-//             </FormGroup>
-//           </FormControl>
-//           {/* <div>
-//         <strong>Selected Values:</strong> {selectedValues.join(', ')}
-//       </div> */}
-//         </Box>
-//       );
-//     case 'select':
-//       return (
-//         <Autocomplete
-//           id={id}
-//           size="small"
-//           options={options}
-//           renderInput={(params) => <TextField name={id} {...params} label={label} variant="outlined" />}
-//         />
-//       );
-//     default:
-//       return null;
-//   }
-// }
-
-// export default function CustomForm(props) {
-//   const { elements, id, name, defaultValues } = props;
-//   const initialFormData = elements.reduce(
-//     (acc, element) => ({
-//       ...acc,
-//       [element.id]: defaultValues?.[element.id] ?? '',
-//     }),
-//     {},
-//   );
-//   console.log(initialFormData);
-//   const [formData, setFormData] = useState(initialFormData);
-//   console.log(formData);
-//   return (
-//     <Box component={Form} method="post" id={id} sx={{ mx: 'auto', mb: 10 }}>
-//       <Typography variant="h5" sx={{ mb: 2 }}>
-//         {name}
-//       </Typography>
-//       <Grid container spacing={2}>
-//         {elements.map((element) => (
-//           <Grid
-//             item
-//             size={{ xs: 12, md: element.field === 'radio' || element.field === 'checkbox' ? 12 : 6 }}
-//             key={element.id}
-//           >
-//             {renderElement(element, formData[element.id], setFormData)}
-//           </Grid>
-//         ))}{' '}
-//         <Grid item container size={{ xs: 12 }}>
-//           <Grid item>
-//             <Button type="submit" variant="contained">
-//               Save
-//             </Button>{' '}
-//           </Grid>
-//           <Grid item>
-//             <Button type="reset" variant="outlined">
-//               Reset
-//             </Button>
-//           </Grid>
-//         </Grid>
-//       </Grid>
-//     </Box>
-//   );
-// }

@@ -1,0 +1,11 @@
+{
+  "name": "final_year_project",
+  "version": "1.3.2",
+  "description": "Health Record Management System and Personal Health Record management and Hospital service management for SEEDUWA ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ishan Hettiarachchi",
+  "license": "ISC"
+}

@@ -41,7 +41,6 @@ export const validate = (formData, elements) => {
     if (element.pattern) {
       // implement any regex pattern if have for a field
       if (!new RegExp(element.pattern).test(formData[element.id])) {
-        console.log(element.pattern);
         errors[element.id] = element.errorText || 'Invalid value'; //custom error message
       }
     }

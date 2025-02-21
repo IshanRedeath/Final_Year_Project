@@ -80,7 +80,7 @@ const options = [
 
 export default function UserTable() {
   const [rowIds, setRowIds] = useState([]);
-  const [rows, setRows] = useState([]);
+  const [rows, setRows] = useState(null);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [canClose, setCanClose] = useState(true);
@@ -132,7 +132,8 @@ export default function UserTable() {
   return (
     <>
       <FormModal open={open} onClose={handleClose} title="Add User">
-        <UserForm setCanClose={setCanClose} />
+        {/* <UserForm setCanClose={setCanClose} /> */}
+        <AddUser />
       </FormModal>
       <CustomTable
         // loading={loading}

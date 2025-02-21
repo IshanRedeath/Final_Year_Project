@@ -3,6 +3,8 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const userRouter = require("./routes/userRoutes");
 const testRouter = require("./routes/testRoutes");
+const employeeRouter = require("./routes/employeeRoutes");
+const rolesRouter = require("./routes/rolesRoutes");
 const app = express();
 
 // const http = require("http");
@@ -28,5 +30,7 @@ app.use(bodyParser.json());
 app.use(cors(corsOptions));
 app.use("/users", userRouter);
 app.use("/tests", testRouter);
+app.use("/employees", employeeRouter);
+app.use("/roles", rolesRouter);
 
 module.exports = app;

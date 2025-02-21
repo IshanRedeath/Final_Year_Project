@@ -27,6 +27,7 @@ import { Form } from 'react-router-dom';
 
 //import Form necessary functions
 import { detectChanges, validate } from './CustomFormFunctions';
+import { customAlert } from './CustomAlert';
 
 function RenderElement(element, value, handleInputChange, setErrors, errors) {
   const { inputAdornment, type, id, label, options, optionLabel, required, props, inputProps } = element;
@@ -88,7 +89,7 @@ function RenderElement(element, value, handleInputChange, setErrors, errors) {
           defaultValue={value || ''}
           onBlur={(e) => handleInputChange(e, id)}
           //onFocus={setErrors({ ...errors, [id]: '' })}
-          error={errors[id] || false}
+          error={Boolean(errors[id]) || false}
           helperText={errors[id] || ''}
         />
       );
@@ -97,7 +98,6 @@ function RenderElement(element, value, handleInputChange, setErrors, errors) {
         <Grid>
           <TextField
             sx={{ mb: 2 }}
-            {...props}
             id={id}
             type={showPassword ? 'text' : 'password'}
             label={label}
@@ -131,12 +131,11 @@ function RenderElement(element, value, handleInputChange, setErrors, errors) {
               setPassword(e.target.value);
             }}
             //onFocus={setErrors({ ...errors, [id]: '' })}
-            error={errors[id] || false}
+            error={Boolean(errors[id]) || false}
             helperText={errors[id] || ''}
           />
           {props.confirmPassword && (
             <TextField
-              {...props}
               //id={id}
               type={showConfirmPassword ? 'text' : 'password'}
               label={`Confirm ${label}`}
@@ -165,7 +164,7 @@ function RenderElement(element, value, handleInputChange, setErrors, errors) {
               onChange={(e) => {
                 setConfirmPassword(e.target.value);
               }}
-              error={errors.confirmPassword || false}
+              error={Boolean(errors.confirmPassword) || false}
               helperText={errors.confirmPassword || ''}
             />
           )}
@@ -193,7 +192,7 @@ function RenderElement(element, value, handleInputChange, setErrors, errors) {
               endAdornment: <InputAdornment position="end">{inputAdornment}</InputAdornment>,
             },
           }}
-          error={errors[id] || false}
+          error={Boolean(errors[id]) || false}
           helperText={errors[id] || ''}
         />
       );
@@ -213,14 +212,14 @@ function RenderElement(element, value, handleInputChange, setErrors, errors) {
           defaultValue={value || ''}
           slotProps={{ inputLabel: { shrink: true }, inputProps: { min: '2003-12-31', max: '2025-10-1' } }}
           onBlur={(e) => handleInputChange(e, id)}
-          error={errors[id] || false}
+          error={Boolean(errors[id]) || false}
           helperText={errors[id] || ''}
         />
       );
     case 'radio':
       return (
         <Box display="flex" alignItems="center" maxHeight="auto">
-          <FormControl error={errors[id] || false}>
+          <FormControl error={Boolean(errors[id]) || false}>
             <FormLabel id={`${id}-group-label`} style={{ marginRight: '16px', marginLeft: '2px' }}>
               {label}
               {required == true ? '*' : null}
@@ -250,7 +249,7 @@ function RenderElement(element, value, handleInputChange, setErrors, errors) {
     case 'checkbox':
       return (
         <Box display="flex" alignItems="start">
-          <FormControl component="fieldset" error={errors[id] || false}>
+          <FormControl component="fieldset" error={Boolean(errors[id]) || false}>
             <FormLabel component="legend">
               {label}
               {required == true ? '*' : null}
@@ -258,15 +257,17 @@ function RenderElement(element, value, handleInputChange, setErrors, errors) {
             <FormGroup row>
               {options.map((option) => (
                 <FormControlLabel
-                  key={option.name}
+                  key={option[optionLabel]}
                   control={
                     <Checkbox
-                      checked={value?.includes(option.value)}
-                      value={option.value}
+                      checked={value?.includes(option[optionLabel])}
+                      value={option[optionLabel]}
                       onChange={(e) => handleInputChange(e, id, true)}
                     />
                   }
-                  label={option.name}
+                  label={option[optionLabel].split(' ').map((word) => {
+                    return word.charAt(0).toUpperCase() + word.slice(1) + ' ';
+                  })}
                 />
               ))}
             </FormGroup>
@@ -284,7 +285,7 @@ function RenderElement(element, value, handleInputChange, setErrors, errors) {
           size="small"
           required={required}
           options={options}
-          value={value || (props?.multiple ? [] : null)}
+          value={value || (props?.multiple ? [] : null)} //if value is null set it to an empty array if and only if multiple is true
           onChange={(e, value) => handleInputChange({ target: { value } }, id)}
           getOptionLabel={(option) => option[optionLabel]}
           // getOptionLabel={(option) => (props?.multiple ? option[optionLabel] : option[0][optionLabel] || '')}
@@ -300,7 +301,7 @@ function RenderElement(element, value, handleInputChange, setErrors, errors) {
           }}
           //filterSelectedOptions={props?.multiple}
           renderInput={(params) => (
-            <TextField {...params} label={label} error={errors[id] || false} helperText={errors[id] || ''} />
+            <TextField {...params} label={label} error={Boolean(errors[id])} helperText={errors[id] || ''} />
           )}
         />
       );
@@ -319,7 +320,7 @@ function RenderElement(element, value, handleInputChange, setErrors, errors) {
           value={value || (props?.multiple ? [] : '')}
           filterSelectedOptions
           renderInput={(params) => (
-            <TextField {...params} label={label} error={errors[id] || false} helperText={errors[id] || ''} />
+            <TextField {...params} label={label} error={Boolean(errors[id])} helperText={errors[id] || ''} />
           )}
         />
       );
@@ -372,7 +373,7 @@ function RenderElement(element, value, handleInputChange, setErrors, errors) {
 }
 
 export default function CustomForm(props) {
-  const { elements, id, name, defaultValues } = props;
+  const { elements, id, name, defaultValues, onSubmit } = props;
   const initialFormData = elements.reduce(
     //initialize the form data with default values
     (acc, element) => ({
@@ -384,7 +385,7 @@ export default function CustomForm(props) {
   );
   const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState(initialFormData);
-
+  console.log(errors);
   const handleInputChange = (event, fieldId, isCheckbox = false) => {
     const { value, checked } = event.target;
     setErrors((prev) => ({ ...prev, [fieldId]: '' })); //remove errors onFocus out
@@ -407,16 +408,47 @@ export default function CustomForm(props) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
+
     const errors = validate(formData, elements);
-    console.log(errors);
-    if (errors) {
+
+    if (Object.values(errors).some((error) => error != '')) {
+      console.log('sda');
       return setErrors((prevErrors) => ({ ...prevErrors, ...errors }));
     }
+
     if (defaultValues) {
       const newChanges = detectChanges(formData, defaultValues);
       console.log(newChanges); // Display the changes
+
+      new Promise((resolve, reject) => {
+        customAlert(resolve, reject, {
+          title: 'Are you sure?',
+          message: 'Do you want to save the changes?',
+          objects: newChanges,
+        });
+      })
+        .then(() => {
+          console.log('Accepted');
+          onSubmit(formData);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
+    new Promise((resolve, reject) => {
+      customAlert(resolve, reject, {
+        title: 'Are you sure?',
+        message: 'Do you want to save the changes?',
+        objects: formData,
+      });
+    })
+      .then(() => {
+        console.log('Accepted');
+        onSubmit(formData);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   return (
@@ -441,7 +473,14 @@ export default function CustomForm(props) {
             </Button>
           </Grid>
           <Grid item>
-            <Button type="reset" variant="outlined" onClick={() => setFormData(initialFormData)}>
+            <Button
+              type="reset"
+              variant="outlined"
+              onClick={() => {
+                setFormData(initialFormData);
+                setErrors('');
+              }}
+            >
               Reset
             </Button>
           </Grid>

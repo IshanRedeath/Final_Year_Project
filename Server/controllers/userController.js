@@ -17,3 +17,10 @@ exports.getAllUsers = async (req, res) => {
     });
   }
 };
+exports.postUser = async (req, res) => {
+  //   try{
+  // const newuser = req.body
+  // const
+  //   }catch{
+  //   }
+};

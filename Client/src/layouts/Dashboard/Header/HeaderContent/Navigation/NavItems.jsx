@@ -54,10 +54,12 @@ export default function NavItems({ item, url }) {
           },
         }}
       >
-        <ListItemIcon sx={{ color: isSelected ? iconSelectedColor : textColor }}>{itemIcon}</ListItemIcon>
+        <ListItemIcon sx={{ color: isSelected ? iconSelectedColor : textColor, mr: 0 }}>
+          {itemIcon}
+        </ListItemIcon>
         <ListItemText
           primary={
-            <Typography variant="h6" sx={{ color: isSelected ? iconSelectedColor : textColor }}>
+            <Typography variant="h6" sx={{ color: isSelected ? iconSelectedColor : textColor, m: 0 }}>
               {item.title}
             </Typography>
           }

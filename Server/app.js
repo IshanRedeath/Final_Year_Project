@@ -1,25 +1,19 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const morgan = require("morgan");
+
 const userRouter = require("./routes/userRoutes");
 const testRouter = require("./routes/testRoutes");
 const employeeRouter = require("./routes/employeeRoutes");
 const rolesRouter = require("./routes/rolesRoutes");
+const errorHandler = require("./controllers/errorController");
 const app = express();
 
-// const http = require("http");
-// const app2 = http
-//   .createServer((req, res) => {
-//     res.write("hello from server");
-//     res.end();
-//   })
-//   .listen(3001);
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
 
-// const fs = require("fs");
-// const text = fs.readFileSync("./txt/test.txt", "utf-8");
-// const text2 = `The content of this file is: ${text}.\nCreated on ${Date.now()}`;
-// fs.writeFileSync("./txt/output.txt", text2);
-// console.log(text);
 const corsOptions = {
   origin: "http://localhost:5173",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
@@ -32,5 +26,7 @@ app.use("/users", userRouter);
 app.use("/tests", testRouter);
 app.use("/employees", employeeRouter);
 app.use("/roles", rolesRouter);
+
+app.use(errorHandler); // handle error response
 
 module.exports = app;

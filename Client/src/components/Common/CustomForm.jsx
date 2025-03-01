@@ -373,7 +373,8 @@ function RenderElement(element, value, handleInputChange, setErrors, errors) {
 }
 
 export default function CustomForm(props) {
-  const { elements, id, name, defaultValues, onSubmit } = props;
+  const { elements, id, name, defaultValues, onSubmit, submitType = 'save' } = props;
+  console.log('Default @form', defaultValues);
   const initialFormData = elements.reduce(
     //initialize the form data with default values
     (acc, element) => ({
@@ -385,7 +386,7 @@ export default function CustomForm(props) {
   );
   const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState(initialFormData);
-  console.log(errors);
+
   const handleInputChange = (event, fieldId, isCheckbox = false) => {
     const { value, checked } = event.target;
     setErrors((prev) => ({ ...prev, [fieldId]: '' })); //remove errors onFocus out
@@ -412,7 +413,6 @@ export default function CustomForm(props) {
     const errors = validate(formData, elements);
 
     if (Object.values(errors).some((error) => error != '')) {
-      console.log('sda');
       return setErrors((prevErrors) => ({ ...prevErrors, ...errors }));
     }
 
@@ -420,7 +420,7 @@ export default function CustomForm(props) {
       const newChanges = detectChanges(formData, defaultValues);
       console.log(newChanges); // Display the changes
 
-      new Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => {
         customAlert(resolve, reject, {
           title: 'Are you sure?',
           message: 'Do you want to save the changes?',
@@ -469,7 +469,7 @@ export default function CustomForm(props) {
         <Grid item container size={{ xs: 12 }}>
           <Grid item>
             <Button type="submit" variant="contained" onClick={handleSubmit}>
-              Save
+              {submitType}
             </Button>
           </Grid>
           <Grid item>

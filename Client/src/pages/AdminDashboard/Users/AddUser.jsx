@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import CustomForm from 'components/Common/CustomForm';
-import { getEmployeeIds, getRolesNames } from 'api/userAPIs';
+import { getEmployeeIds, getRolesNames, createUser } from 'api/userAPIs';
 
 export default function AddUser() {
   const [employees, setEmployees] = useState([]);
@@ -61,11 +61,28 @@ export default function AddUser() {
   }, []);
 
   const handleSubmit = (formData) => {
-    console.log('AddUser form: ', formData);
+    try {
+      console.log(formData);
+      createUser(formData)
+        .then((res) => {
+          console.log('User Created', res);
+        })
+        .catch((err) => {
+          console.error('Connection Error ', err);
+        });
+    } catch (e) {
+      console.log('Error: ', e);
+    }
   };
   return (
     <div>
-      <CustomForm elements={elements} id="addUsers" name="Add User Form" onSubmit={handleSubmit} />
+      <CustomForm
+        elements={elements}
+        id="addUsers"
+        name="Add User Form"
+        onSubmit={handleSubmit}
+        submitType="Create"
+      />
     </div>
   );
 }

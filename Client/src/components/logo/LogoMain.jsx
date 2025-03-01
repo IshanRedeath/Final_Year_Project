@@ -1,4 +1,5 @@
 // material-ui
+import { Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 /**
@@ -8,7 +9,8 @@ import { useTheme } from '@mui/material/styles';
  *
  *
  */
-import logo from 'assets/logo/Seeduwa_Hospitals.jpg';
+import logo from 'assets/logo/Logo_transparent.jpg';
+import logowithname from 'assets/logo/hospital_logo_with_name.png';
 
 // ==============================|| LOGO SVG ||============================== //
 
@@ -22,4 +24,25 @@ const Logo = () => {
   );
 };
 
-export default Logo;
+const LogoPng = () => {
+  const theme = useTheme();
+
+  return (
+    <>
+      <Box
+        sx={{
+          backgroundColor: 'rgba(255, 255, 255, 0.5)',
+          height: '80px',
+          alignItems: 'center',
+          display: 'flex',
+          justifyContent: 'center',
+          borderRadius: '12px',
+        }}
+      >
+        {' '}
+        <img src={logowithname} alt="Seeduwa Hospitals" width="auto" height="250px" />
+      </Box>
+    </>
+  );
+};
+export { Logo, LogoPng };

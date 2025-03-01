@@ -20,7 +20,7 @@ import PrintTwoToneIcon from '@mui/icons-material/PrintTwoTone';
 
 //APi
 import { apiFetch } from 'api/base';
-import { getUsersUsingAxios } from 'api/testAPIs';
+import { deleteUser, updateUser, getUsers, getOneUser } from 'api/userAPIs';
 import { Tooltip } from '@mui/material';
 import { Navigate, useNavigate } from 'react-router-dom';
 
@@ -29,72 +29,63 @@ import CustomTable from 'components/Common/CustomTable';
 import FormModal from 'components/Common/FormModal';
 import AddUser from './AddUser';
 import UserForm from './UserForm';
+import UpdateUser from './UpdateUser';
 
 //User Table Option functions
-const handleUserEdit = (id) => {
-  console.log('edit ', id);
-};
-const handleUserDelete = (id) => {
-  console.log('delete ', id);
-};
-const handleUserEmail = (id) => {
-  console.log('email ', id);
-};
-const handleUserView = (id) => {
-  console.log('view ', id);
-};
-
-//User Table Each row menu Options List
-const options = [
-  {
-    title: 'Delete',
-    icon: <DeleteTwoToneIcon color="error" />,
-    action: (id) => handleUserDelete(id),
-
-    selectedMany: true,
-    visible: true,
-  },
-
-  {
-    title: 'Email',
-    icon: <EmailTwoToneIcon color="primary" />,
-    action: (id) => handleUserEmail(id),
-    selectedMany: true,
-    visible: true,
-  },
-  {
-    title: 'Edit',
-    icon: <EditTwoToneIcon color="action" />,
-    action: (id) => handleUserEdit(id),
-    selectedMany: false,
-    visible: false,
-  },
-  {
-    title: 'View',
-    icon: <PrintTwoToneIcon color="info" />,
-    action: (id) => handleUserView(id),
-    selectedMany: false,
-    visible: false,
-  },
-];
 
 export default function UserTable() {
   const [rowIds, setRowIds] = useState([]);
   const [rows, setRows] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [openAddModal, setOpenAddModal] = useState(false);
+  const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [canClose, setCanClose] = useState(true);
+  const [updateUserId, setUpdateUserId] = useState({});
   const navigate = useNavigate();
   const handleClickOpen = () => {
-    setOpen(true);
+    setOpenAddModal(true);
+  };
+  const handleUserEdit = (id) => {
+    setUpdateUserId(id);
+    setOpenUpdateModal(true);
+  };
+  const handleUserDelete = (id) => {
+    try {
+      deleteUser(id)
+        .then((res) => {
+          console.log('User Deleted', res);
+        })
+        .catch((err) => {
+          console.error('Connection Error ', err);
+        });
+    } catch (e) {
+      console.log('Error: ', e);
+    }
+  };
+  const handleUserEmail = (id) => {
+    window.location.href = `mailto:user${id}@localhost?subject=Hello&body=This is a test email`;
   };
 
-  const handleClose = () => {
+  const handleUserView = (id) => {
+    console.log('view ', id);
+  };
+
+  const handleCloseAddModal = () => {
     if (canClose) {
-      setOpen(false);
+      setOpenAddModal(false);
     } else {
       if (window.confirm('Are you sure you want to close the form?')) {
-        setOpen(false);
+        setOpenAddModal(false);
+      }
+    }
+    setCanClose(true);
+  };
+  const handleCloseUpdateModal = () => {
+    if (canClose) {
+      setOpenUpdateModal(false);
+    } else {
+      if (window.confirm('Are you sure you want to close the form?')) {
+        setOpenUpdateModal(false);
       }
     }
     setCanClose(true);
@@ -107,7 +98,7 @@ export default function UserTable() {
     console.log('data is fetching....');
     try {
       setLoading(true);
-      getUsersUsingAxios()
+      getUsers()
         .then((res) => {
           const data = res.data.data.users;
 
@@ -128,12 +119,48 @@ export default function UserTable() {
       setLoading(false);
     }
   }, []);
+  //User Table Each row menu Options List
+  const options = [
+    {
+      title: 'Delete',
+      icon: <DeleteTwoToneIcon color="error" />,
+      action: (id) => handleUserDelete(id),
+
+      selectedMany: true,
+      visible: true,
+    },
+
+    {
+      title: 'Email',
+      icon: <EmailTwoToneIcon color="primary" />,
+      action: (id) => handleUserEmail(id),
+      selectedMany: true,
+      visible: true,
+    },
+    {
+      title: 'Edit',
+      icon: <EditTwoToneIcon color="action" />,
+      action: (id, data) => handleUserEdit(id, data),
+      selectedMany: false,
+      visible: false,
+    },
+    {
+      title: 'View',
+      icon: <PrintTwoToneIcon color="info" />,
+      action: (id) => handleUserView(id),
+      selectedMany: false,
+      visible: false,
+    },
+  ];
 
   return (
     <>
-      <FormModal open={open} onClose={handleClose} title="Add User">
+      <FormModal open={openAddModal} onClose={handleCloseAddModal} title="Add User">
         {/* <UserForm setCanClose={setCanClose} /> */}
         <AddUser />
+      </FormModal>
+      <FormModal open={openUpdateModal} onClose={handleCloseUpdateModal} title="Update User">
+        <UpdateUser id={updateUserId} />
       </FormModal>
       <CustomTable
         // loading={loading}

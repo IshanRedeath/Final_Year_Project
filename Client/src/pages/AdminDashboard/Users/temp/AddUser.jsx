@@ -5,18 +5,7 @@ import CustomForm from 'components/Common/CustomForm';
 import { max } from 'lodash';
 import EmailTwoToneIcon from '@mui/icons-material/EmailTwoTone';
 import { InputAdornment } from '@mui/material';
-const defaultValues = {
-  username: 'Ishan',
-  email: 'jsdjg@gasg',
-  bd: '2024-12-12',
-  password: 'sdfsdf',
-  gender: 'female',
-  checkbox: ['option1'],
-  selectedRoles1: ['Admin', 'receptionist'],
-  selectedRoles2: 'Admin',
-  selectedRoles3: [{ name: 'Admin' }, { name: 'doctor' }],
-  selectedRoles4: { name: 'Admin' },
-};
+
 const elements = [
   {
     type: 'text',
@@ -135,7 +124,7 @@ const elements = [
   },
 ];
 
-export default function AddUser() {
+export default function AddUser(defaultValues = {}) {
   const errors = useActionData();
   // const data = useLoaderData();
   const { state } = useNavigation();

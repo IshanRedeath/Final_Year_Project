@@ -20,20 +20,7 @@ export default function FormModal(props) {
   const { children, open, onClose, title } = props;
   return (
     <React.Fragment>
-      <Dialog
-        open={open}
-        PaperProps={{
-          component: 'form',
-          onSubmit: (event) => {
-            event.preventDefault();
-            const formData = new FormData(event.currentTarget);
-            const formJson = Object.fromEntries(formData.entries());
-            const email = formJson.email;
-            console.log(email);
-            onClose();
-          },
-        }}
-      >
+      <Dialog open={open} onClose={onclose}>
         <DialogTitle sx={{ bgcolor: 'lightblue' }}>
           {title}
           <Button

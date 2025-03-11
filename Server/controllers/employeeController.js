@@ -5,9 +5,7 @@ exports.getAllEmployees = async (req, res) => {
     res.status(200).json({
       status: "success",
       results: employees.length,
-      data: {
-        employees,
-      },
+      data: employees,
     });
   } catch (err) {
     console.log(err);
@@ -24,14 +22,16 @@ exports.getActiveEmployeeNames = async (req, res) => {
       {
         status: "Active",
       },
-      "emp_no fullname -_id"
+      "empId fullname -_id"
     );
+    const transformedEmployees = employeeNames.map((emp) => ({
+      id: emp.empId, // Rename empId to id
+      fullname: emp.fullname,
+    }));
     res.status(200).json({
       status: "success",
       results: employeeNames.length,
-      data: {
-        employeeNames,
-      },
+      data: transformedEmployees,
     });
   } catch (err) {
     console.log(err);

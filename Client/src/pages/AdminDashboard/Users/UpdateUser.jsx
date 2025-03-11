@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react';
 import CustomForm from 'components/Common/CustomForm';
 import { getEmployeeIds, getRolesNames, patchUser, getOneUser } from 'api/userAPIs';
+import UseAPI from 'hooks/useAPI';
 
 export default function UpdateUser({ id }) {
+  const { fetchData } = UseAPI();
   const [employees, setEmployees] = useState([]);
   const [defaultValues, setDefaultValues] = useState(null);
   const [roles, setRoles] = useState([]);
   const elements = [
     {
       type: 'objectSelect',
-      id: 'employee',
+      id: 'user',
       label: 'Select Employee',
       required: true,
       optionLabel: 'fullname',
@@ -55,31 +57,15 @@ export default function UpdateUser({ id }) {
   ];
 
   useEffect(() => {
-    async function fetchData() {
-      await getEmployeeIds().then((res) => {
-        setEmployees(res.data.data.employeeNames);
-      });
-      await getRolesNames().then((res) => setRoles(res.data.data));
-      await getOneUser(id).then((res) => {
-        setDefaultValues(res.data.data);
-      });
-    }
-    fetchData();
+    const fetchArray = [
+      { function: getRolesNames, setFunction: setRoles },
+      { function: getEmployeeIds, setFunction: setEmployees },
+      { function: () => getOneUser(id), setFunction: setDefaultValues },
+    ];
+
+    fetchData(fetchArray);
   }, []);
-  console.log('default: ', defaultValues, 'id: ', id);
-  const handleSubmit = (formData) => {
-    try {
-      patchUser(id, formData)
-        .then((res) => {
-          console.log('User Updated', res);
-        })
-        .catch((err) => {
-          console.error('Connection Error ', err);
-        });
-    } catch (e) {
-      console.log('Error: ', e);
-    }
-  };
+
   return (
     <div>
       <CustomForm
@@ -87,9 +73,10 @@ export default function UpdateUser({ id }) {
         elements={elements}
         id="updateUsers"
         name="Update User Form"
-        onSubmit={handleSubmit}
+        onSubmit={patchUser}
         submitType="Update"
         defaultValues={defaultValues}
+        updateId={id}
       />
     </div>
   );

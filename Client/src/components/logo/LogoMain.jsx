@@ -1,5 +1,4 @@
 // material-ui
-import { Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 /**
@@ -29,19 +28,8 @@ const LogoPng = () => {
 
   return (
     <>
-      <Box
-        sx={{
-          backgroundColor: 'rgba(255, 255, 255, 0.5)',
-          height: '80px',
-          alignItems: 'center',
-          display: 'flex',
-          justifyContent: 'center',
-          borderRadius: '12px',
-        }}
-      >
-        {' '}
-        <img src={logowithname} alt="Seeduwa Hospitals" width="auto" height="250px" />
-      </Box>
+      {' '}
+      <img src={logowithname} alt="Seeduwa Hospitals" width="auto" height="250px" />
     </>
   );
 };

@@ -5,6 +5,7 @@ import Users from 'pages/AdminDashboard/Users';
 import { addUserRoutes } from 'pages/AdminDashboard/Users/temp/AddUser';
 import AddUser from 'pages/AdminDashboard/Users/AddUser';
 import Priviledges from 'pages/AdminDashboard/Priviledges';
+import AppointmentStepper from 'pages/AdminDashboard/Appointment/AppointmentStepper';
 
 //export router object by createbrowserRouter
 const adminRoutes = {
@@ -15,7 +16,7 @@ const adminRoutes = {
     {
       path: 'appointments',
       children: [
-        { index: true, element: <h1>Appointments</h1> },
+        { index: true, element: <AppointmentStepper /> },
         { path: 'calendar', element: <h1>Calendar</h1> },
       ],
     },

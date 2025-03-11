@@ -28,6 +28,8 @@ import { Form } from 'react-router-dom';
 //import Form necessary functions
 import { detectChanges, validate } from './CustomFormFunctions';
 import { customAlert } from './CustomAlert';
+import { useFeedback } from 'context/feedbackContext';
+import UseAPI from 'hooks/useAPI';
 
 function RenderElement(element, value, handleInputChange, setErrors, errors) {
   const { inputAdornment, type, id, label, options, optionLabel, required, props, inputProps } = element;
@@ -373,8 +375,8 @@ function RenderElement(element, value, handleInputChange, setErrors, errors) {
 }
 
 export default function CustomForm(props) {
-  const { elements, id, name, defaultValues, onSubmit, submitType = 'save' } = props;
-  console.log('Default @form', defaultValues);
+  const { elements, id, name, defaultValues, onSubmit, submitType = 'save', updateId } = props;
+  const { createData, updateData } = UseAPI();
   const initialFormData = elements.reduce(
     //initialize the form data with default values
     (acc, element) => ({
@@ -416,7 +418,7 @@ export default function CustomForm(props) {
       return setErrors((prevErrors) => ({ ...prevErrors, ...errors }));
     }
 
-    if (defaultValues) {
+    if (defaultValues || submitType === 'update') {
       const newChanges = detectChanges(formData, defaultValues);
       console.log(newChanges); // Display the changes
 
@@ -428,8 +430,7 @@ export default function CustomForm(props) {
         });
       })
         .then(() => {
-          console.log('Accepted');
-          onSubmit(formData);
+          updateData(() => onSubmit(updateId, formData));
         })
         .catch((err) => {
           console.log(err);
@@ -443,11 +444,25 @@ export default function CustomForm(props) {
       });
     })
       .then(() => {
-        console.log('Accepted');
-        onSubmit(formData);
+        //   try {
+        //     setLoader(true);
+        //     onSubmit(formData)
+        //       .then((res) => {
+        //         setSuccess(res.data.message);
+        //         setLoader(false);
+        //       })
+        //       .catch((err) => {
+        //         setError(err.response.data.message);
+        //         setLoader(false);
+        //       });
+        //   } catch (err) {
+        //     setError(err.message);
+        //     setLoader(false);
+        //   }
+        createData(() => onSubmit(formData));
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
   };
 

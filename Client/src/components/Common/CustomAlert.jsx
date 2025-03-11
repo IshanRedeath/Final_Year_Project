@@ -10,6 +10,7 @@ import Typography from '@mui/material/Typography';
 import { confirmAlert } from 'react-confirm-alert';
 
 export const customAlert = (resolve, reject, props) => {
+  const { title, objects, message } = props;
   const RenderObject = ({ data }) => {
     if (!data || typeof data !== 'object') {
       return <span style={{ color: 'grey' }}>{data}</span>;
@@ -39,7 +40,6 @@ export const customAlert = (resolve, reject, props) => {
     );
   };
 
-  const { title, objects, message } = props;
   confirmAlert({
     customUI: ({ onClose }) => {
       return (

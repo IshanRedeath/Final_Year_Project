@@ -4,12 +4,18 @@ const validator = require("validator");
 // const slugify = require("slugify");
 
 const userSchema = new mongoose.Schema({
-  userId: {
-    type: String,
-    index: true,
-    required: true,
-    unique: true,
-    minlength: 6,
+  user: {
+    id: {
+      type: String,
+      required: true,
+      unique: true,
+      minlength: 6,
+    },
+    fullname: {
+      type: String,
+      required: true,
+      minlength: 2,
+    },
   },
 
   username: {
@@ -38,11 +44,16 @@ const userSchema = new mongoose.Schema({
   pictureUrl: { type: String },
   createdAt: { type: Date, default: Date.now },
   modifiedAt: { type: Date },
+  deletedAt: { type: Date },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  modifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  deletedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+
   lastLogin: { type: Date },
 
   status: {
     type: String,
-    enum: ["active", "inactive"],
+    enum: ["active", "inactive", "deleted"],
     default: "active",
   },
 });

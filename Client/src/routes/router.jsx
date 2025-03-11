@@ -5,6 +5,8 @@ import {
   redirect,
   RouterProvider,
   useLocation,
+  ScrollRestoration,
+  useNavigation,
 } from 'react-router-dom';
 import adminRoutes from './adminRoutes';
 import doctorRoutes from './doctorRoutes';
@@ -16,6 +18,8 @@ import Login from '../pages/patientPortal/Login';
 import { useEffect } from 'react';
 import { Dashboard } from '@mui/icons-material';
 import DashboardLayout from '../layouts/Dashboard';
+import Loading from 'components/Loading';
+import { set } from 'lodash';
 
 // Combine routes
 //TODO: EDit session redirect, add patient routes, add unauthorized route
@@ -24,7 +28,12 @@ export const router = createBrowserRouter([
     path: '/',
 
     element: <RootLayout />,
-
+    loader: async ({ request }) => {
+      setTimeout(() => {
+        console.log('hello');
+      }, 5000);
+      return null;
+    },
     children: [
       adminRoutes,
       doctorRoutes,
@@ -45,10 +54,15 @@ export const router = createBrowserRouter([
 ]);
 
 function RootLayout() {
+  const { state } = useNavigation();
+  console.log('Navigation state is : ', state);
+  const isLoading = state === 'loading';
   return (
     <>
       {/* <SessionRedirect /> */}
       <DashboardLayout />
+      <ScrollRestoration />
+      <Loading loadingState={isLoading} />
     </>
   );
 }

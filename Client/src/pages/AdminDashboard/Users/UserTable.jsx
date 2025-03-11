@@ -20,7 +20,7 @@ import PrintTwoToneIcon from '@mui/icons-material/PrintTwoTone';
 
 //APi
 import { apiFetch } from 'api/base';
-import { deleteUser, updateUser, getUsers, getOneUser } from 'api/userAPIs';
+import { deleteUser, getUsers } from 'api/userAPIs';
 import { Tooltip } from '@mui/material';
 import { Navigate, useNavigate } from 'react-router-dom';
 
@@ -30,10 +30,13 @@ import FormModal from 'components/Common/FormModal';
 import AddUser from './AddUser';
 import UserForm from './UserForm';
 import UpdateUser from './UpdateUser';
+import UseAPI from 'hooks/useAPI';
+import { customAlert } from 'components/Common/CustomAlert';
 
 //User Table Option functions
 
 export default function UserTable() {
+  const { deleteData, fetchData } = UseAPI();
   const [rowIds, setRowIds] = useState([]);
   const [rows, setRows] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -50,17 +53,17 @@ export default function UserTable() {
     setOpenUpdateModal(true);
   };
   const handleUserDelete = (id) => {
-    try {
-      deleteUser(id)
-        .then((res) => {
-          console.log('User Deleted', res);
-        })
-        .catch((err) => {
-          console.error('Connection Error ', err);
-        });
-    } catch (e) {
-      console.log('Error: ', e);
-    }
+    console.log('userTable:', id, typeof id);
+    new Promise((resolve, reject) => {
+      customAlert(resolve, reject, {
+        title: 'Are you sure you want to delete this user?',
+        message: `user ID: ${id}`,
+      });
+    })
+      .then(() => {
+        deleteData(() => deleteUser(id));
+      })
+      .catch(() => console.log('User did not agree'));
   };
   const handleUserEmail = (id) => {
     window.location.href = `mailto:user${id}@localhost?subject=Hello&body=This is a test email`;
@@ -95,29 +98,8 @@ export default function UserTable() {
   // };
 
   useEffect(() => {
-    console.log('data is fetching....');
-    try {
-      setLoading(true);
-      getUsers()
-        .then((res) => {
-          const data = res.data.data.users;
-
-          setRows(data);
-        })
-        .catch((err) => {
-          console.error('Connection Error ', err);
-        })
-        .finally(() => {
-          setTimeout(() => {
-            setLoading(false);
-          }, 2000);
-        });
-
-      console.log(rows);
-    } catch (e) {
-      console.log('Error: ', e);
-      setLoading(false);
-    }
+    const fetchArray = [{ function: getUsers, setFunction: setRows }];
+    fetchData(fetchArray);
   }, []);
   //User Table Each row menu Options List
   const options = [
@@ -126,8 +108,8 @@ export default function UserTable() {
       icon: <DeleteTwoToneIcon color="error" />,
       action: (id) => handleUserDelete(id),
 
-      selectedMany: true,
-      visible: true,
+      selectedMany: false,
+      visible: false,
     },
 
     {
@@ -170,14 +152,21 @@ export default function UserTable() {
         rows={rows}
         columns={columns}
         tableName="User"
-        id="userId"
+        //id="_id"
+        nestedId="id"
+        id="user"
       />
     </>
   );
 }
 
 const columns = [
-  { id: 'userId', label: 'ID', width: 70 },
+  {
+    id: 'userId',
+    label: 'ID',
+    width: 70,
+    formatCell: (params) => params.user.id,
+  },
 
   {
     id: 'profile',

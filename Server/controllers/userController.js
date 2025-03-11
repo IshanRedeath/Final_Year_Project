@@ -1,7 +1,8 @@
 const User = require("../models/users/userModel");
-const Counter = require("../models/counterModal");
+
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/AppError");
+const Employee = require("../models/employeeModel");
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.find().select("-password");
@@ -9,14 +10,12 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     results: users.length,
-    data: {
-      users,
-    },
+    data: users,
   });
 });
 
 exports.getUser = catchAsync(async (req, res, next) => {
-  const user = await User.findOne({ userId: req.params.id }).select(
+  const user = await User.findOne({ "user.id": req.params.id }).select(
     "-password"
   );
   if (!user) {
@@ -30,31 +29,43 @@ exports.getUser = catchAsync(async (req, res, next) => {
 });
 
 exports.postUser = catchAsync(async (req, res, next) => {
-  if (!req.body.userId) {
-    const counter = await Counter.findByIdAndUpdate(
-      // incrementing the counter for userId generation.
-      "67c09c3b695f1828a9174e9b",
-      { $inc: { seq: 1 } },
-      { new: true, upsert: true }
+  // if (!req.body.userId) {
+  //   const counter = await Counter.findByIdAndUpdate(
+  //     // incrementing the counter for userId generation.
+  //     "67c09c3b695f1828a9174e9b",
+  //     { $inc: { seq: 1 } },
+  //     { new: true, upsert: true }
+  //   );
+  //   req.body.userId = `EM${counter.seq.toString()}`;
+  // }
+  const person = await Employee.findOne({ empId: req.body.user.id });
+  if (person) {
+    const newUser = await User.create(req.body);
+    res.status(201).json({
+      status: "success",
+      data: newUser,
+      message: "User created successfully",
+    });
+  } else {
+    return next(
+      new AppError(`No employee found with ID, ${req.body.user.id}`, 404)
     );
-    req.body.userId = `EM${counter.seq.toString()}`;
   }
-  const newUser = await User.create(req.body);
-  res.status(201).json({
-    status: "success",
-    data: {
-      newUser,
-    },
-    message: "User created successfully",
-  });
 });
 
 exports.deleteUser = catchAsync(async (req, res, next) => {
   const id = req.params.id;
+  console.log(id);
   let user;
-  if (id.length === 6) {
-    user = await User.findOneAndDelete({ userId: id }); // for 'EM1001' format id
+  //Array class with isArray method to check whether the id is an array
+  if (typeof id === "object" || Array.isArray(id)) {
+    console.log("hello world 1");
+    user = await User.deleteMany({ _id: { $in: id } }); //$in to check whether the id is 'IN' the array
+  } else if (id.length === 7) {
+    console.log("hello world 2");
+    user = await User.findOneAndDelete({ "user.id": id }); // for 'EM1001' format id
   } else {
+    console.log("hello world 3");
     user = await User.findByIdAndDelete(id); // for mongoDb generated objectId
   }
 
@@ -62,9 +73,8 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
     return next(new AppError(`No user found with ID, ${id}`, 404));
   }
   console.log("User deleted successfully");
-  res.status(200).json({
+  res.status(204).json({
     status: "success",
-    data: null,
     message: "User deleted successfully",
   });
 });
@@ -76,7 +86,7 @@ exports.updateUser = catchAsync(async (req, res, next) => {
   );
 
   const user = await User.findOneAndUpdate(
-    { userId: req.params.id },
+    { "user.id": req.params.id },
     req.body,
     { new: true, runValidators: true }
   );

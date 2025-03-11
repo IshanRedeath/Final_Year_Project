@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import CustomForm from 'components/Common/CustomForm';
 import { getEmployeeIds, getRolesNames, createUser } from 'api/userAPIs';
+import UseAPI from 'hooks/useAPI';
 
 export default function AddUser() {
+  const { fetchData } = UseAPI();
+
   const [employees, setEmployees] = useState([]);
   const [roles, setRoles] = useState([]);
   const elements = [
     {
       type: 'objectSelect',
-      id: 'employee',
+      id: 'user',
       label: 'Select Employee',
       required: true,
       optionLabel: 'fullname',
@@ -54,33 +57,21 @@ export default function AddUser() {
   ];
 
   useEffect(() => {
-    getEmployeeIds().then((res) => {
-      setEmployees(res.data.data.employeeNames);
-    });
-    getRolesNames().then((res) => setRoles(res.data.data));
+    const fetchArray = [
+      { function: getRolesNames, setFunction: setRoles },
+      { function: getEmployeeIds, setFunction: setEmployees },
+    ];
+
+    fetchData(fetchArray);
   }, []);
 
-  const handleSubmit = (formData) => {
-    try {
-      console.log(formData);
-      createUser(formData)
-        .then((res) => {
-          console.log('User Created', res);
-        })
-        .catch((err) => {
-          console.error('Connection Error ', err);
-        });
-    } catch (e) {
-      console.log('Error: ', e);
-    }
-  };
   return (
     <div>
       <CustomForm
         elements={elements}
         id="addUsers"
         name="Add User Form"
-        onSubmit={handleSubmit}
+        onSubmit={createUser}
         submitType="Create"
       />
     </div>

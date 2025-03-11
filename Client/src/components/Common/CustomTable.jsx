@@ -66,7 +66,13 @@ function EnhancedTableToolbar(props) {
           //Handle options functions when more than one row selected
           return (
             <Tooltip key={id} title={option.title}>
-              <IconButton onClick={() => option.action(selected)}>{option.icon}</IconButton>
+              <IconButton
+                onClick={() => {
+                  selected.forEach((element) => option.action(element));
+                }}
+              >
+                {option.icon}
+              </IconButton>
             </Tooltip>
           );
         }
@@ -174,7 +180,7 @@ CustomTable.propTypes = {
 };
 
 export default function CustomTable(props) {
-  const { columns, rows, tableName, id, loading, toolbarOptions, add } = props;
+  const { columns, rows, tableName, id, loading, toolbarOptions, add, nestedId } = props;
   const [innerloading, setInnerLoading] = React.useState(loading);
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('id');
@@ -271,14 +277,14 @@ export default function CustomTable(props) {
             <TableBody>
               {visibleRows ? (
                 visibleRows.map((row, index) => {
-                  const isItemSelected = selected.includes(row[id]); //check if the row is selected
+                  const isItemSelected = selected.includes(nestedId ? row[id][nestedId] : row[id]); //check if the row is selected
                   const labelId = `enhanced-table-checkbox-${index}`;
 
                   return (
                     <TableRow
                       key={row[id]}
                       hover
-                      onClick={(event) => handleClick(event, row[id])}
+                      onClick={(event) => handleClick(event, nestedId ? row[id][nestedId] : row[id])}
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
@@ -307,6 +313,7 @@ export default function CustomTable(props) {
                   );
                 })
               ) : (
+                //===================================================
                 //if no visible rows, render a row with a message
                 <TableRow
                   style={{
@@ -317,6 +324,7 @@ export default function CustomTable(props) {
                     No data to Show
                   </TableCell>
                 </TableRow>
+                //=====================================================
               )}
               {emptyRows > 0 && ( // if there are empty rows, render them to avoid layout jump
                 <TableRow

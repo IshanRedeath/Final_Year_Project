@@ -1,7 +1,7 @@
 import { apiAxios } from './base';
 
-export function getUsers(options) {
-  return apiAxios.get('/users', options);
+export function getUsers(query, options) {
+  return apiAxios.get(`/users${query ? '?' + query : ''}`, options);
 }
 export function getOneUser(id, options) {
   return apiAxios.get(`/users/${id}`, options);
@@ -29,4 +29,7 @@ export function getEmployees(options) {
 
 export function getEmployeeIds(options) {
   return apiAxios.get('/employees/active', options);
+}
+export function getUserView(url, options) {
+  return apiAxios.get(`/users/view?${url}`, options);
 }

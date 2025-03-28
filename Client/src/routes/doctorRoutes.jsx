@@ -1,12 +1,11 @@
-import React from "react";
-import { Outlet } from "react-router-dom";
+import React from 'react';
+import { Outlet } from 'react-router-dom';
 
 //export router object by createbrowserRouter
 const doctorRoutes = {
-  path: "doctor-dashboard",
+  path: 'doctor-dashboard',
   element: (
     <>
-      {" "}
       <h1>Doctor Dashboard</h1>
       <Outlet />
     </>

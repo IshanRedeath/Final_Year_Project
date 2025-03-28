@@ -7,7 +7,12 @@ export default function AlertBar(props) {
 
   return (
     <div>
-      <Snackbar open={open} autoHideDuration={6000} onClose={onClose}>
+      <Snackbar
+        open={open}
+        autoHideDuration={6000}
+        onClose={onClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
         <Alert onClose={onClose} severity={severity} variant="filled" sx={{ width: '100%' }}>
           {message}
         </Alert>

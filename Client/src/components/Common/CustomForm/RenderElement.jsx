@@ -1,13 +1,5 @@
-import PropTypes from 'prop-types';
-import React, { useState, useEffect } from 'react';
-// MUI components
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
-import Autocomplete from '@mui/material/Autocomplete';
-import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Grid2';
+import { useState, useEffect } from 'react';
+//mui components
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -17,21 +9,19 @@ import FormGroup from '@mui/material/FormGroup';
 import FormHelperText from '@mui/material/FormHelperText';
 import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
-import Divider from '@mui/material/Divider';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
+import Autocomplete from '@mui/material/Autocomplete';
+import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid2';
 
 //mui Icons
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
-import { Form } from 'react-router-dom';
-
-//import Form necessary functions
-import { detectChanges, validate } from './CustomFormFunctions';
-import { customAlert } from './CustomAlert';
-import { useFeedback } from 'context/feedbackContext';
-import UseAPI from 'hooks/useAPI';
-
-function RenderElement(element, value, handleInputChange, setErrors, errors) {
+export default function RenderElement(element, value, handleInputChange, setErrors, errors) {
   const { inputAdornment, type, id, label, options, optionLabel, required, props, inputProps } = element;
 
   //dedicated for password and confirmPassword fields..
@@ -369,138 +359,27 @@ function RenderElement(element, value, handleInputChange, setErrors, errors) {
           )}
         </Box>
       );
+
+    case 'time':
+      return (
+        <TextField
+          {...props}
+          id={id}
+          type="time"
+          label={label}
+          size="small"
+          name={id}
+          fullWidth
+          required={required}
+          defaultValue={value || ''}
+          slotProps={{ inputLabel: { shrink: true } }}
+          onBlur={(e) => handleInputChange(e, id)}
+          error={Boolean(errors[id]) || false}
+          helperText={errors[id] || ''}
+        />
+      );
+
     default:
       return null;
   }
-}
-
-export default function CustomForm(props) {
-  const { elements, id, name, defaultValues, onSubmit, submitType = 'save', updateId } = props;
-  const { createData, updateData } = UseAPI();
-  const initialFormData = elements.reduce(
-    //initialize the form data with default values
-    (acc, element) => ({
-      //map the elements array to an object with the element id as key and the defaultValue as value and accumilate them to retun at once
-      ...acc, //function's accumilated results
-      [element.id]: defaultValues?.[element.id] ?? '', //check whether the default value exists respective to elemnt id and if not set it to an empty string
-    }),
-    {},
-  );
-  const [errors, setErrors] = useState({});
-  const [formData, setFormData] = useState(initialFormData);
-
-  const handleInputChange = (event, fieldId, isCheckbox = false) => {
-    const { value, checked } = event.target;
-    setErrors((prev) => ({ ...prev, [fieldId]: '' })); //remove errors onFocus out
-    setFormData((prev) => {
-      if (isCheckbox) {
-        return {
-          ...prev,
-          [fieldId]: checked
-            ? [...(prev[fieldId] || []), value]
-            : prev[fieldId].filter((item) => item !== value),
-        };
-      }
-
-      return {
-        ...prev,
-        [fieldId]: value,
-      };
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const errors = validate(formData, elements);
-
-    if (Object.values(errors).some((error) => error != '')) {
-      return setErrors((prevErrors) => ({ ...prevErrors, ...errors }));
-    }
-
-    if (defaultValues || submitType === 'update') {
-      const newChanges = detectChanges(formData, defaultValues);
-      console.log(newChanges); // Display the changes
-
-      return new Promise((resolve, reject) => {
-        customAlert(resolve, reject, {
-          title: 'Are you sure?',
-          message: 'Do you want to save the changes?',
-          objects: newChanges,
-        });
-      })
-        .then(() => {
-          updateData(() => onSubmit(updateId, formData));
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-    new Promise((resolve, reject) => {
-      customAlert(resolve, reject, {
-        title: 'Are you sure?',
-        message: 'Do you want to save the changes?',
-        objects: formData,
-      });
-    })
-      .then(() => {
-        //   try {
-        //     setLoader(true);
-        //     onSubmit(formData)
-        //       .then((res) => {
-        //         setSuccess(res.data.message);
-        //         setLoader(false);
-        //       })
-        //       .catch((err) => {
-        //         setError(err.response.data.message);
-        //         setLoader(false);
-        //       });
-        //   } catch (err) {
-        //     setError(err.message);
-        //     setLoader(false);
-        //   }
-        createData(() => onSubmit(formData));
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  };
-
-  return (
-    <Box component={Form} method="post" id={id} sx={{ mx: 'auto', mb: 10 }}>
-      <Typography variant="h5" sx={{ mb: 2 }}>
-        {name}
-      </Typography>
-      <Grid container spacing={2}>
-        {elements.map((element) => (
-          <Grid
-            item
-            size={{ xs: 12, md: element.type === 'radio' || element.type === 'checkbox' ? 12 : 6 }}
-            key={element.id}
-          >
-            {RenderElement(element, formData[element.id], handleInputChange, setErrors, errors)}
-          </Grid>
-        ))}
-        <Grid item container size={{ xs: 12 }}>
-          <Grid item>
-            <Button type="submit" variant="contained" onClick={handleSubmit}>
-              {submitType}
-            </Button>
-          </Grid>
-          <Grid item>
-            <Button
-              type="reset"
-              variant="outlined"
-              onClick={() => {
-                setFormData(initialFormData);
-                setErrors('');
-              }}
-            >
-              Reset
-            </Button>
-          </Grid>
-        </Grid>
-      </Grid>
-    </Box>
-  );
 }

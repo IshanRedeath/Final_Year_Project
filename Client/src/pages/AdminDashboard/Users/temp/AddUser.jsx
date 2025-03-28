@@ -1,5 +1,5 @@
 import React from 'react';
-import UserForm from '../UserForm';
+
 import { redirect, useActionData, useLoaderData, useNavigation } from 'react-router-dom';
 import CustomForm from 'components/Common/CustomForm';
 import { max } from 'lodash';
@@ -46,6 +46,7 @@ const elements = [
     id: 'checkbox',
     label: 'Checkbox',
     required: true,
+    optionLabel: 'name',
     options: [
       { id: 1, name: 'Option 1', value: 'option1', defaultChecked: true },
       { id: 2, name: 'Option 2', value: 'option2' },
@@ -124,7 +125,7 @@ const elements = [
   },
 ];
 
-export default function AddUser(defaultValues = {}) {
+export default function AddUser() {
   const errors = useActionData();
   // const data = useLoaderData();
   const { state } = useNavigation();
@@ -137,7 +138,7 @@ export default function AddUser(defaultValues = {}) {
         id="addUsers"
         name="Add User Form"
         //ssd
-        defaultValues={defaultValues}
+        // defaultValues={defaultValues}
       />
     </div>
   );

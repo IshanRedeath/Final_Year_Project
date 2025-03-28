@@ -29,12 +29,14 @@ import CheckCircleOutlined from '@ant-design/icons/CheckCircleOutlined';
 import GiftOutlined from '@ant-design/icons/GiftOutlined';
 import MessageOutlined from '@ant-design/icons/MessageOutlined';
 import SettingOutlined from '@ant-design/icons/SettingOutlined';
+import NotificationImportantIcon from '@mui/icons-material/NotificationImportant';
+import { useFeedback } from 'context/feedbackContext';
 
 // sx styles
 const avatarSX = {
   width: 36,
   height: 36,
-  fontSize: '1rem'
+  fontSize: '1rem',
 };
 
 const actionSX = {
@@ -44,12 +46,13 @@ const actionSX = {
   right: 'auto',
   alignSelf: 'flex-start',
 
-  transform: 'none'
+  transform: 'none',
 };
 
 // ==============================|| HEADER CONTENT - NOTIFICATION ||============================== //
 
 export default function Notification() {
+  const { notifications } = useFeedback();
   const theme = useTheme();
   const matchesXs = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -96,7 +99,14 @@ export default function Notification() {
       >
         {({ TransitionProps }) => (
           <Transitions type="grow" position={matchesXs ? 'top' : 'top-right'} in={open} {...TransitionProps}>
-            <Paper sx={{ boxShadow: theme.customShadows.z1, width: '100%', minWidth: 285, maxWidth: { xs: 285, md: 420 } }}>
+            <Paper
+              sx={{
+                boxShadow: theme.customShadows.z1,
+                width: '100%',
+                minWidth: 285,
+                maxWidth: { xs: 285, md: 420 },
+              }}
+            >
               <ClickAwayListener onClickAway={handleClose}>
                 <MainCard
                   title="Notification"
@@ -123,8 +133,8 @@ export default function Notification() {
                         py: 0.5,
                         '&.Mui-selected': { bgcolor: 'grey.50', color: 'text.primary' },
                         '& .MuiAvatar-root': avatarSX,
-                        '& .MuiListItemSecondaryAction-root': { ...actionSX, position: 'relative' }
-                      }
+                        '& .MuiListItemSecondaryAction-root': { ...actionSX, position: 'relative' },
+                      },
                     }}
                   >
                     <ListItemButton selected={read > 0}>
@@ -152,6 +162,34 @@ export default function Notification() {
                       </ListItemSecondaryAction>
                     </ListItemButton>
                     <Divider />
+                    {notifications.map((notification, index) => {
+                      return (
+                        <div key={index}>
+                          <ListItemButton>
+                            <ListItemAvatar>
+                              <Avatar
+                                sx={{
+                                  color: `${notification.severity}.main`,
+                                  bgcolor: `${notification.severity}.lighter`,
+                                }}
+                              >
+                                {' '}
+                                <NotificationImportantIcon />
+                              </Avatar>
+                            </ListItemAvatar>
+                            <ListItemText
+                              primary={<Typography variant="h6">{notification.message}</Typography>}
+                            />
+                            <ListItemSecondaryAction>
+                              <Typography variant="caption" noWrap>
+                                {notification.time}
+                              </Typography>
+                            </ListItemSecondaryAction>
+                          </ListItemButton>
+                          <Divider />
+                        </div>
+                      );
+                    })}
                     <ListItemButton>
                       <ListItemAvatar>
                         <Avatar sx={{ color: 'primary.main', bgcolor: 'primary.lighter' }}>

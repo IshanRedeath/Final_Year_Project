@@ -11,6 +11,9 @@ import { confirmAlert } from 'react-confirm-alert';
 
 export const customAlert = (resolve, reject, props) => {
   const { title, objects, message } = props;
+  //const object = JSON.parse(JSON.stringify(objects)); //support  object duplication but not nesteD
+  //const object = {...objects}; //support  object duplication but not nestea
+  const object = structuredClone(objects); //support  object duplication evern deep nested
   const RenderObject = ({ data }) => {
     if (!data || typeof data !== 'object') {
       return <span style={{ color: 'grey' }}>{data}</span>;
@@ -28,9 +31,11 @@ export const customAlert = (resolve, reject, props) => {
                 ) : typeof data[key] === 'object' ? (
                   <RenderObject data={data[key]} /> // Recursively render nested objects
                 ) : key === 'password' ? (
-                  '*****'
-                ) : (
+                  'xxxx'
+                ) : key !== '_id' ? (
                   data[key]
+                ) : (
+                  delete data[key]
                 )}
               </span>
             </Typography>
@@ -58,7 +63,7 @@ export const customAlert = (resolve, reject, props) => {
               <DialogContentText id="alert-dialog-description">
                 {message}
                 <br />
-                {objects && <RenderObject data={objects} />}
+                {object && <RenderObject data={object} />}
               </DialogContentText>
             </DialogContent>
             <DialogActions>

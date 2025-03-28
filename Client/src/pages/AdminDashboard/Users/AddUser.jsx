@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import CustomForm from 'components/Common/CustomForm';
+
 import { getEmployeeIds, getRolesNames, createUser } from 'api/userAPIs';
 import UseAPI from 'hooks/useAPI';
+import CustomForm from 'components/Common/CustomForm';
 
 export default function AddUser() {
-  const { fetchData } = UseAPI();
+  const { fetchData, createData } = UseAPI();
 
   const [employees, setEmployees] = useState([]);
   const [roles, setRoles] = useState([]);
@@ -65,15 +66,13 @@ export default function AddUser() {
     fetchData(fetchArray);
   }, []);
 
+  const handleSubmit = (data) => {
+    createData(createUser, data);
+  };
+
   return (
     <div>
-      <CustomForm
-        elements={elements}
-        id="addUsers"
-        name="Add User Form"
-        onSubmit={createUser}
-        submitType="Create"
-      />
+      <CustomForm elements={elements} name="Add User Form" onSubmit={handleSubmit} submitType="Create" />
     </div>
   );
 }

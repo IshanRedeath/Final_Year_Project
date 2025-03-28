@@ -33,44 +33,44 @@
 
 //   return newChanges;
 // };
-export const detectChanges = (formData, defaultValues) => {
-  const newChanges = Object.keys(formData).reduce((acc, objKey) => {
-    if (Object.prototype.hasOwnProperty.call(defaultValues, objKey)) {
-      const formValue = formData[objKey]; // New value
-      const defaultValue = defaultValues[objKey]; // Old value
+// export const detectChanges = (formData, defaultValues) => {
+//   const newChanges = Object.keys(formData).reduce((acc, objKey) => {
+//     if (Object.prototype.hasOwnProperty.call(defaultValues, objKey)) {// Check if the key exists in `defaultValues`
+//       const formValue = formData[objKey]; // New value
+//       const defaultValue = defaultValues[objKey]; // Old value
 
-      // Handle nested objects
-      if (
-        formValue &&
-        typeof formValue === 'object' && // Check if the new value is an object
-        !Array.isArray(formValue) && // Check if the new value is not an array
-        defaultValue &&
-        typeof defaultValue === 'object' && // Check if the old value is an object
-        !Array.isArray(defaultValue) // Check if the old value is not an array
-      ) {
-        const nestedChanges = detectChanges(formValue, defaultValue); // Recursively check for changes
+//       // Handle nested objects
+//       if (
+//         formValue &&
+//         typeof formValue === 'object' && // Check if the new value is an object
+//         !Array.isArray(formValue) && // Check if the new value is not an array
+//         defaultValue &&
+//         typeof defaultValue === 'object' && // Check if the old value is an object
+//         !Array.isArray(defaultValue) // Check if the old value is not an array
+//       ) {
+//         const nestedChanges = detectChanges(formValue, defaultValue); // Recursively check for changes
 
-        if (Object.keys(nestedChanges).length > 0) {
-          acc[objKey] = nestedChanges; //  Store nested changes inside parent key
-        }
-        return acc;
-      }
+//         if (Object.keys(nestedChanges).length > 0) {
+//           acc[objKey] = nestedChanges; //  Store nested changes inside parent key
+//         }
+//         return acc;
+//       }
 
-      // Compare arrays or objects as JSON strings for display purposes
-      const isObjectOrArray = (val) => typeof val === 'object' && val !== null;
-      const formValueString = isObjectOrArray(formValue) ? JSON.stringify(formValue) : formValue; //  Convert to string if new value object or array
-      const defaultValueString = isObjectOrArray(defaultValue) ? JSON.stringify(defaultValue) : defaultValue; //  Convert to string if old value object or array
+//       // Compare arrays or objects as JSON strings for display purposes
+//       const isObjectOrArray = (val) => typeof val === 'object' && val !== null;
+//       const formValueString = isObjectOrArray(formValue) ? JSON.stringify(formValue) : formValue; //  Convert to string if new value object or array
+//       const defaultValueString = isObjectOrArray(defaultValue) ? JSON.stringify(defaultValue) : defaultValue; //  Convert to string if old value object or array
 
-      // Compare values
-      if (formValueString !== defaultValueString) {
-        acc[objKey] = `${defaultValueString} => ${formValueString}`; //  Store changes inside the key
-      }
-    }
-    return acc;
-  }, {}); //  Use an object instead of an array
+//       // Compare values
+//       if (formValueString !== defaultValueString) {
+//         acc[objKey] = `${defaultValueString} => ${formValueString}`; //  Store changes inside the key
+//       }
+//     }
+//     return acc;
+//   }, {}); //  Use an object instead of an array
 
-  return newChanges;
-};
+//   return newChanges;
+// };
 // export const detectChanges = (formData, defaultValues = {}) => {
 //   const newChanges = {};
 

@@ -1,13 +1,21 @@
 import { useEffect, useState } from 'react';
-import CustomForm from 'components/Common/CustomForm';
+
 import { getEmployeeIds, getRolesNames, patchUser, getOneUser } from 'api/userAPIs';
 import UseAPI from 'hooks/useAPI';
+import { useNavigate, useParams } from 'react-router-dom';
+import CustomForm from 'components/Common/CustomForm';
+export default function UpdateUser({ Id }) {
+  const { id } = useParams();
 
-export default function UpdateUser({ id }) {
-  const { fetchData } = UseAPI();
+  if (!Id) {
+    Id = id;
+  }
+  console.log(Id);
+  const { fetchData, updateData } = UseAPI();
   const [employees, setEmployees] = useState([]);
   const [defaultValues, setDefaultValues] = useState(null);
   const [roles, setRoles] = useState([]);
+  const navigate = useNavigate();
   const elements = [
     {
       type: 'objectSelect',
@@ -60,11 +68,15 @@ export default function UpdateUser({ id }) {
     const fetchArray = [
       { function: getRolesNames, setFunction: setRoles },
       { function: getEmployeeIds, setFunction: setEmployees },
-      { function: () => getOneUser(id), setFunction: setDefaultValues },
+      { function: () => getOneUser(Id), setFunction: setDefaultValues },
     ];
 
     fetchData(fetchArray);
   }, []);
+  const handleSubmit = (data) => {
+    navigate('/admin-dashboard/users');
+    updateData(patchUser, Id, data);
+  };
 
   return (
     <div>
@@ -73,10 +85,10 @@ export default function UpdateUser({ id }) {
         elements={elements}
         id="updateUsers"
         name="Update User Form"
-        onSubmit={patchUser}
+        onSubmit={handleSubmit}
         submitType="Update"
         defaultValues={defaultValues}
-        updateId={id}
+        updateId={Id}
       />
     </div>
   );

@@ -12,6 +12,7 @@ const initialState = {
 };
 export const ApiFeedbackProvider = ({ children }) => {
   const [alert, setAlert] = useState(initialState);
+  const [notifications, setNotifications] = useState([]);
   const [open, setOpen] = useState(false);
   //  set Error and success so that less rerenders plus keep previosstate when update errors
   const setError = (errorMsg) => {
@@ -20,6 +21,19 @@ export const ApiFeedbackProvider = ({ children }) => {
       error: errorMsg,
       success: '',
     }));
+    setNotifications((prevState) => [
+      ...prevState,
+      {
+        message: errorMsg,
+        severity: 'error',
+        read: false,
+        time: new Date().toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true, // Change to false for 24-hour format
+        }),
+      },
+    ]);
     setOpen(true);
   };
   const setSuccess = (successMessage) => {
@@ -28,6 +42,19 @@ export const ApiFeedbackProvider = ({ children }) => {
       success: successMessage,
       error: '',
     }));
+    setNotifications((prevState) => [
+      ...prevState,
+      {
+        message: successMessage,
+        severity: 'success',
+        read: false,
+        time: new Date().toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true, // Change to false for 24-hour format
+        }),
+      },
+    ]);
     setOpen(true);
   };
 
@@ -46,7 +73,9 @@ export const ApiFeedbackProvider = ({ children }) => {
   };
   return (
     <>
-      <ApiFeedbackContext.Provider value={{ setError, setSuccess, setLoader, alert }}>
+      <ApiFeedbackContext.Provider
+        value={{ setError, setSuccess, setLoader, alert, notifications, setNotifications }}
+      >
         {children} <Loading loadingState={alert.loading} />{' '}
         {alert.error && (
           <div>

@@ -4,9 +4,11 @@ const cors = require("cors");
 const morgan = require("morgan");
 
 const userRouter = require("./routes/userRoutes");
+const doctorRouter = require("./routes/doctorRoutes");
 const testRouter = require("./routes/testRoutes");
 const employeeRouter = require("./routes/employeeRoutes");
 const rolesRouter = require("./routes/rolesRoutes");
+const priviledgeRouter = require("./routes/priviledgeRoutes");
 const errorHandler = require("./controllers/errorController");
 const app = express();
 
@@ -26,6 +28,8 @@ app.use("/users", userRouter);
 app.use("/tests", testRouter);
 app.use("/employees", employeeRouter);
 app.use("/roles", rolesRouter);
+app.use("/doctors", doctorRouter);
+app.use("/priviledges", priviledgeRouter);
 
 app.use(errorHandler); // handle error response
 

@@ -13,7 +13,7 @@ export default function UseAPI() {
           if (object.setFunction) {
             object.setFunction(res.data.data); // Update state
           }
-          setSuccess(res.data.message); // Show success message
+          return res;
         }),
       );
     } catch (error) {
@@ -24,11 +24,28 @@ export default function UseAPI() {
       setLoader(false);
     }
   };
-
-  const deleteData = async (deleteFunc) => {
+  const fetchOne = async (getOneFunc, id, setFunction) => {
     try {
       setLoader(true);
-      const res = await deleteFunc();
+      const res = await getOneFunc(id);
+
+      if (setFunction) {
+        setFunction(res.data.data);
+      }
+      return res.data.data;
+    } catch (error) {
+      console.log(error);
+      setError(error.response?.data?.message || 'An error occurred connecting to the server');
+      console.error('Error fetching API data: ', error);
+    } finally {
+      setLoader(false);
+    }
+  };
+
+  const deleteData = async (deleteFunc, id) => {
+    try {
+      setLoader(true);
+      const res = await deleteFunc(id);
       if (res.status === 204) setSuccess('Item deleted successfully!');
       console.log('Item deleted successfully');
     } catch (err) {
@@ -38,10 +55,10 @@ export default function UseAPI() {
     }
   };
 
-  const createData = async (createFunc) => {
+  const createData = async (createFunc, data) => {
     try {
       setLoader(true);
-      const res = await createFunc();
+      const res = await createFunc(data);
       if (res.status === 201 || res.data.status === 'success') {
         setSuccess(res.data.message);
         console.log(res.data.message);
@@ -54,10 +71,10 @@ export default function UseAPI() {
     }
   };
 
-  const updateData = async (updateFunc) => {
+  const updateData = async (updateFunc, id, data) => {
     try {
       setLoader(true);
-      const res = await updateFunc();
+      const res = await updateFunc(id, data);
       if (res.status === 200 || res.data.status === 'success') {
         setSuccess(res.data.message);
       }
@@ -69,5 +86,5 @@ export default function UseAPI() {
     }
   };
 
-  return { fetchData, deleteData, createData, updateData };
+  return { fetchData, deleteData, createData, updateData, fetchOne };
 }

@@ -11,6 +11,7 @@ const employeeSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true, maxlength: 150 },
   address: { type: String, required: true },
   note: { type: String },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 });
 
 const Employee = mongoose.model("Employee", employeeSchema);

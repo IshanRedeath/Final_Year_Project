@@ -19,8 +19,10 @@ import { useEffect } from 'react';
 import { Dashboard } from '@mui/icons-material';
 import DashboardLayout from '../layouts/Dashboard';
 import Loading from 'components/Loading';
-import { set } from 'lodash';
-
+import AddUser from 'pages/AdminDashboard/Users/temp/AddUser';
+import PrintableComponent from 'components/PrintView/index';
+import PrintView from 'components/PrintView';
+import PrintViewHeader from 'components/PrintView/PrintViewHeader';
 // Combine routes
 //TODO: EDit session redirect, add patient routes, add unauthorized route
 export const router = createBrowserRouter([
@@ -28,12 +30,7 @@ export const router = createBrowserRouter([
     path: '/',
 
     element: <RootLayout />,
-    loader: async ({ request }) => {
-      setTimeout(() => {
-        console.log('hello');
-      }, 5000);
-      return null;
-    },
+
     children: [
       adminRoutes,
       doctorRoutes,
@@ -51,11 +48,12 @@ export const router = createBrowserRouter([
     path: '/unauthorized',
     element: <h1>Unauthorized </h1>, //Replace with <Unauthorized/> component
   },
+  { path: '/test', element: <PrintView /> },
 ]);
 
 function RootLayout() {
   const { state } = useNavigation();
-  console.log('Navigation state is : ', state);
+
   const isLoading = state === 'loading';
   return (
     <>

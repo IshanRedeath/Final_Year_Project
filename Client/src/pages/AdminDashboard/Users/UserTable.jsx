@@ -1,160 +1,75 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 //MUI Core Componensts
 
 import Grid from '@mui/material/Grid2';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 //Mui Icons
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
+
 import EmailTwoToneIcon from '@mui/icons-material/EmailTwoTone';
 import CircleIcon from '@mui/icons-material/Circle';
-import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
-import PrintTwoToneIcon from '@mui/icons-material/PrintTwoTone';
 
-//APi
-import { apiFetch } from 'api/base';
-import { deleteUser, getUsers } from 'api/userAPIs';
-import { Tooltip } from '@mui/material';
-import { Navigate, useNavigate } from 'react-router-dom';
+//API
+import { deleteUser, getUsers, getOneUser, getUserView } from 'api/userAPIs';
 
 //project imports
-import CustomTable from 'components/Common/CustomTable';
 import FormModal from 'components/Common/FormModal';
 import AddUser from './AddUser';
-import UserForm from './UserForm';
 import UpdateUser from './UpdateUser';
-import UseAPI from 'hooks/useAPI';
-import { customAlert } from 'components/Common/CustomAlert';
+import CustomTable from 'components/Common/CustomTable';
 
 //User Table Option functions
 
 export default function UserTable() {
-  const { deleteData, fetchData } = UseAPI();
-  const [rowIds, setRowIds] = useState([]);
-  const [rows, setRows] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
-  const [canClose, setCanClose] = useState(true);
   const [updateUserId, setUpdateUserId] = useState({});
-  const navigate = useNavigate();
-  const handleClickOpen = () => {
-    setOpenAddModal(true);
-  };
-  const handleUserEdit = (id) => {
-    setUpdateUserId(id);
-    setOpenUpdateModal(true);
-  };
-  const handleUserDelete = (id) => {
-    console.log('userTable:', id, typeof id);
-    new Promise((resolve, reject) => {
-      customAlert(resolve, reject, {
-        title: 'Are you sure you want to delete this user?',
-        message: `user ID: ${id}`,
-      });
-    })
-      .then(() => {
-        deleteData(() => deleteUser(id));
-      })
-      .catch(() => console.log('User did not agree'));
-  };
+
   const handleUserEmail = (id) => {
     window.location.href = `mailto:user${id}@localhost?subject=Hello&body=This is a test email`;
   };
 
-  const handleUserView = (id) => {
-    console.log('view ', id);
+  const handleUserEdit = (id) => {
+    setUpdateUserId(id);
+    setOpenUpdateModal(true);
   };
-
-  const handleCloseAddModal = () => {
-    if (canClose) {
-      setOpenAddModal(false);
-    } else {
-      if (window.confirm('Are you sure you want to close the form?')) {
-        setOpenAddModal(false);
-      }
-    }
-    setCanClose(true);
-  };
-  const handleCloseUpdateModal = () => {
-    if (canClose) {
-      setOpenUpdateModal(false);
-    } else {
-      if (window.confirm('Are you sure you want to close the form?')) {
-        setOpenUpdateModal(false);
-      }
-    }
-    setCanClose(true);
-  };
-  // const handleFormState = (state) => {
-  //   setFormState(state);
-  // };
-
-  useEffect(() => {
-    const fetchArray = [{ function: getUsers, setFunction: setRows }];
-    fetchData(fetchArray);
-  }, []);
-  //User Table Each row menu Options List
+  //User Table Each row menu Additional Options List
   const options = [
-    {
-      title: 'Delete',
-      icon: <DeleteTwoToneIcon color="error" />,
-      action: (id) => handleUserDelete(id),
-
-      selectedMany: false,
-      visible: false,
-    },
-
     {
       title: 'Email',
       icon: <EmailTwoToneIcon color="primary" />,
       action: (id) => handleUserEmail(id),
       selectedMany: true,
-      visible: true,
-    },
-    {
-      title: 'Edit',
-      icon: <EditTwoToneIcon color="action" />,
-      action: (id, data) => handleUserEdit(id, data),
-      selectedMany: false,
-      visible: false,
-    },
-    {
-      title: 'View',
-      icon: <PrintTwoToneIcon color="info" />,
-      action: (id) => handleUserView(id),
-      selectedMany: false,
-      visible: false,
     },
   ];
 
   return (
     <>
-      <FormModal open={openAddModal} onClose={handleCloseAddModal} title="Add User">
-        {/* <UserForm setCanClose={setCanClose} /> */}
+      <FormModal
+        open={openAddModal}
+        onClose={() => {
+          setOpenAddModal(false);
+        }}
+        title="Add User"
+      >
         <AddUser />
       </FormModal>
-      <FormModal open={openUpdateModal} onClose={handleCloseUpdateModal} title="Update User">
-        <UpdateUser id={updateUserId} />
+      <FormModal open={openUpdateModal} onClose={() => setOpenUpdateModal(false)} title="Update User">
+        <UpdateUser Id={updateUserId} />
       </FormModal>
       <CustomTable
-        // loading={loading}
-        add={handleClickOpen}
-        // add={() => navigate('/admin-dashboard/users/add-user')}
-        toolbarOptions={options}
-        rows={rows}
+        add="/admin-dashboard/users/add"
+        //edit="/admin-dashboard/users/edit"
+        edit={handleUserEdit}
+        options={options}
+        get={getUsers}
+        del={deleteUser}
+        view={getUserView}
         columns={columns}
         tableName="User"
-        //id="_id"
-        nestedId="id"
-        id="user"
+        // id="_id" //optional
       />
     </>
   );
@@ -169,7 +84,8 @@ const columns = [
   },
 
   {
-    id: 'profile',
+    delete: true,
+    id: 'username',
     label: 'Profile',
     width: 300,
     formatCell: (params) => renderUserNameField(params),
@@ -177,6 +93,7 @@ const columns = [
 
   {
     id: 'roles',
+    isFilterable: true,
     label: 'Access Roles',
     width: 150,
     formatCell: (params) => renderRolesField(params),
@@ -185,22 +102,23 @@ const columns = [
   {
     id: 'status',
     label: 'Status',
+    isFilterable: true,
     width: 100,
     formatCell: (params) => renderStatusField(params),
   },
-  { id: 'createdAt', label: 'Created At', width: 100 },
-  { id: 'lastLogin', label: 'Last Active', width: 100 },
+  { id: 'createdAt', label: 'Created At', width: 100, isFilterable: true },
+  { id: 'lastLogin', label: 'Last Active', width: 100, isFilterable: true },
 ];
 
 //Render User Table fields
 const renderUserNameField = (row) => (
   <Grid container alignItems="center" spacing={2} style={{ maxWidth: 300 }}>
-    <Grid item>
+    <Grid>
       <Avatar src={row.pictureUrl} alt={row.username} sx={{ width: 40, height: 40 }} />
     </Grid>
 
     {/* Full Name and Email */}
-    <Grid item>
+    <Grid>
       <Grid container direction="column" alignItems="flex-start">
         <Typography variant="body1" fontWeight="bold">
           {row.username}

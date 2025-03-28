@@ -1,158 +1,34 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
+//react router
+import { useNavigate } from 'react-router-dom';
 //Mui Components
-import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
-import TableSortLabel from '@mui/material/TableSortLabel';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
-import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
-import { visuallyHidden } from '@mui/utils';
+import Switch from '@mui/material/Switch';
+import FormControlLabel from '@mui/material/FormControlLabel';
 //Mui Icons
-import FilterListIcon from '@mui/icons-material/FilterList';
-import ControlPointTwoToneIcon from '@mui/icons-material/ControlPointTwoTone';
+import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
+import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
+import PrintTwoToneIcon from '@mui/icons-material/PrintTwoTone';
+//project imports
+import UseAPI from 'hooks/useAPI';
+import { customAlert } from 'components/Common/CustomAlert';
+//Component
+import EnhancedTableToolbar from './EnhancedTableToolBar';
+import EnhancedTableHead from './EnhancedTableHead';
+import FilterOptionsModal from './FilterOptionsModal';
+import PrintViewModal from './PrintViewModal';
 
 // ##############################--Table header components and header functions--##############################
 
-//Top toolbar component
-function EnhancedTableToolbar(props) {
-  const { numSelected, tableName, toolbarOptions, selected, add } = props;
-  return (
-    <Toolbar
-      sx={[
-        {
-          pl: { sm: 2 },
-          pr: { xs: 1, sm: 1 },
-        },
-        numSelected > 0 && {
-          //change bgcolor when a row selected
-          bgcolor: (theme) => alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
-        },
-      ]}
-    >
-      {numSelected > 0 ? (
-        <Typography sx={{ flex: '1 1 100%' }} color="inherit" variant="subtitle1" component="div">
-          {numSelected} selected
-        </Typography>
-      ) : (
-        <>
-          <Typography sx={{ flex: '1 1 100%' }} variant="h6" id="tableTitle" component="div">
-            {`${tableName} Table`}
-          </Typography>
-          <Tooltip title="Filter list">
-            <IconButton>
-              <FilterListIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Add ">
-            <IconButton onClick={add}>
-              <ControlPointTwoToneIcon />
-            </IconButton>
-          </Tooltip>
-        </>
-      )}
-      {toolbarOptions?.map((option, id) => {
-        if (numSelected > 1 && option.selectedMany) {
-          //Handle options functions when more than one row selected
-          return (
-            <Tooltip key={id} title={option.title}>
-              <IconButton
-                onClick={() => {
-                  selected.forEach((element) => option.action(element));
-                }}
-              >
-                {option.icon}
-              </IconButton>
-            </Tooltip>
-          );
-        }
-        if (numSelected === 1) {
-          //handle options functions when only one row selected
-          return (
-            <Tooltip key={id} title={option.title}>
-              <IconButton onClick={() => option.action(selected[0])}>{option.icon}</IconButton>
-            </Tooltip>
-          );
-        }
-      })}
-      {}
-    </Toolbar>
-  );
-}
-
-EnhancedTableToolbar.propTypes = {
-  numSelected: PropTypes.number.isRequired,
-  tableName: PropTypes.string.isRequired,
-  toolbarOptions: PropTypes.array.isRequired,
-  selected: PropTypes.array.isRequired,
-};
-//Table head component
-function EnhancedTableHead(props) {
-  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, columns } = props;
-  const createSortHandler = (property) => (event) => {
-    onRequestSort(event, property);
-  };
-
-  return (
-    <TableHead>
-      <TableRow sx={{ backgroundColor: 'lightblue' }}>
-        <TableCell padding="checkbox">
-          <Checkbox
-            color="primary"
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-            inputProps={{
-              'aria-label': 'select all desserts',
-            }}
-          />
-        </TableCell>
-        {columns.map((headCell) => (
-          <TableCell
-            style={{ minWidth: headCell.width }}
-            key={headCell.id}
-            align={headCell.align ? headCell.align : 'left'}
-            // padding={headCell.disablePadding ? 'none' : 'normal'}
-            sortDirection={orderBy === headCell.id ? order : false}
-          >
-            <TableSortLabel
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : 'asc'}
-              onClick={createSortHandler(headCell.id)}
-            >
-              {headCell.label}
-              {orderBy === headCell.id ? (
-                <Box component="span" sx={visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                </Box>
-              ) : null}
-            </TableSortLabel>
-          </TableCell>
-        ))}
-      </TableRow>
-    </TableHead>
-  );
-}
-
-EnhancedTableHead.propTypes = {
-  numSelected: PropTypes.number.isRequired,
-  onRequestSort: PropTypes.func.isRequired,
-  onSelectAllClick: PropTypes.func.isRequired,
-  order: PropTypes.oneOf(['asc', 'desc']).isRequired,
-  orderBy: PropTypes.string.isRequired,
-  rowCount: PropTypes.number.isRequired,
-  columns: PropTypes.array.isRequired,
-};
 // ############################################################################################################
 
 function descendingComparator(a, b, orderBy) {
@@ -171,23 +47,113 @@ function getComparator(order, orderBy) {
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 CustomTable.propTypes = {
-  columns: PropTypes.array.isRequired,
-
-  tableName: PropTypes.string.isRequired,
-  id: PropTypes.string.isRequired,
-  toolbarOptions: PropTypes.array.isRequired,
-  add: PropTypes.func,
+  columns: PropTypes.array.isRequired, //columns to be displayed in the table
+  tableName: PropTypes.string.isRequired, //name of the table
+  id: PropTypes.string, //id of the row to be used as a unique key(Optional)
+  options: PropTypes.array, //options to be displayed in the toolbar(Optional)
+  add: PropTypes.oneOfType([PropTypes.func, PropTypes.string]).isRequired, // add function or add route path to add new data
+  edit: PropTypes.oneOfType([PropTypes.func, PropTypes.string]).isRequired, // edit function or edit route path to edit data
+  del: PropTypes.func.isRequired, //function to delete data
+  get: PropTypes.func.isRequired, //function to get data
+  view: PropTypes.func, //function to view data
 };
 
 export default function CustomTable(props) {
-  const { columns, rows, tableName, id, loading, toolbarOptions, add, nestedId } = props;
-  const [innerloading, setInnerLoading] = React.useState(loading);
+  const {
+    columns,
+    tableName,
+    options = [],
+    add,
+    edit,
+    del,
+    get,
+    view,
+    id = '_id',
+    //  deleteFieldName = '_id',
+  } = props;
+
+  const [rows, setRows] = React.useState(null);
+  const [openFilterModal, setOpenFilterModal] = React.useState(false);
+  const [openViewModal, setOpenViewModal] = React.useState(false);
+  const [viewData, setViewData] = React.useState({});
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('id');
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(true);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [count, setCount] = React.useState(0);
+  const deleteFieldName = columns.find((column) => column.delete === true)?.id || '_id';
+  const defautOptions = [
+    {
+      title: 'Delete',
+      icon: <DeleteTwoToneIcon color="error" />,
+      action: (id) => handleDelete(id, deleteFieldName, rows.find((row) => row._id === id)[deleteFieldName]),
+      selectedMany: false,
+    },
+
+    {
+      title: 'Edit',
+      icon: <EditTwoToneIcon color="action" />,
+      action: (id) => handleEdit(id),
+      selectedMany: false,
+    },
+    {
+      title: 'View',
+      icon: <PrintTwoToneIcon color="info" />,
+      action: (id) => handleView(id),
+      selectedMany: true,
+    },
+  ];
+  const navigate = useNavigate();
+  const { fetchData, deleteData } = UseAPI();
+
+  React.useEffect(() => {
+    const fetchArray = [{ function: get, setFunction: setRows }];
+    get ? fetchData(fetchArray) : null;
+  }, [count]);
+  const toolbarOptions = [...defautOptions, ...options];
+  const handleRefresh = () => {
+    setCount(count + 1);
+  };
+  const handleFilterOpen = () => {
+    setOpenFilterModal(true);
+  };
+  const handleFilterClose = () => {
+    setOpenFilterModal(false);
+  };
+  const handleViewOpen = () => {
+    setOpenViewModal(true);
+  };
+  const handleViewClose = () => {
+    setOpenViewModal(false);
+  };
+  const handleDelete = (id, name, value) => {
+    new Promise((resolve, reject) => {
+      customAlert(resolve, reject, {
+        title: 'Are you sure you want to delete this user?',
+        message: `${name}: ${value}`,
+      });
+    })
+      .then(() => {
+        deleteData(del, id);
+      })
+      .then(() => {
+        handleRefresh();
+        setSelected([]);
+      })
+      .catch(() => console.log('User did not agree'));
+  };
+  const handleEdit = (id) => (typeof edit === 'string' ? navigate(`${edit}/${id}`) : edit(id));
+  const handleAdd = () => (typeof add === 'string' ? navigate(add) : add);
+  const handleView = (id) => {
+    const url = `id=${id}`;
+
+    const fetchArray = [{ function: () => view(url), setFunction: setViewData }];
+    fetchData(fetchArray);
+    handleViewOpen();
+  };
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -199,12 +165,13 @@ export default function CustomTable(props) {
     if (event.target.checked) {
       const newSelected = rows ? rows.map((n) => n[id]) : []; //The result is a new array containing only the id values of all elements in rows if rows available
       setSelected(newSelected);
+      console.log(newSelected);
       return;
     }
     setSelected([]);
   };
   // Handler row click event
-  const handleClick = (event, id) => {
+  const handleClick = (id) => {
     const selectedIndex = selected.indexOf(id); // return the index of the element id in 'selected' array, if it exits, else return -1
     let newSelected = [];
 
@@ -234,9 +201,9 @@ export default function CustomTable(props) {
   };
 
   //handle dense padding switch change event
-  // const handleChangeDense = (event) => {
-  //   setDense(event.target.checked);
-  // };
+  const handleChangeDense = (event) => {
+    setDense(event.target.checked);
+  };
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
@@ -248,20 +215,42 @@ export default function CustomTable(props) {
       }
       return [...rows]
         .sort(getComparator(order, orderBy)) // sort the rows based on order column and orderBy(asc,desc),thenn
-        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+        .filter((row) => JSON.stringify(row).toLowerCase().includes(searchQuery.toLowerCase()));
     }, //return only a chunk(rows per page) for the g from overall 'rows' arrays
-    [order, orderBy, page, rowsPerPage, rows],
+    [order, orderBy, page, rowsPerPage, rows, searchQuery],
   );
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
 
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mt: 2 }}>
+        <PrintViewModal
+          key={JSON.stringify(viewData)}
+          name={tableName}
+          data={viewData}
+          open={openViewModal}
+          onclose={handleViewClose}
+        />
+        <FilterOptionsModal
+          getDataFunc={get}
+          columns={columns}
+          setRows={setRows}
+          open={openFilterModal}
+          onclose={handleFilterClose}
+        />
         <EnhancedTableToolbar
           numSelected={selected.length}
           tableName={tableName}
           toolbarOptions={toolbarOptions}
-          add={add}
+          add={handleAdd}
           selected={selected}
+          setOpenFilterModal={handleFilterOpen}
+          handleSearchChange={handleSearchChange}
+          searchQuery={searchQuery}
+          refresh={handleRefresh}
         />
         <TableContainer>
           <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
@@ -274,17 +263,26 @@ export default function CustomTable(props) {
               rowCount={rows ? rows.length : 0}
               columns={columns}
             />
-            <TableBody>
+            <TableBody
+            // onContextMenu={(event) => {
+            //   event.preventDefault();
+            //   setSelected([]);
+            // }}
+            >
               {visibleRows ? (
                 visibleRows.map((row, index) => {
-                  const isItemSelected = selected.includes(nestedId ? row[id][nestedId] : row[id]); //check if the row is selected
+                  const isItemSelected = selected.includes(row[id]); //check if the row is selected
                   const labelId = `enhanced-table-checkbox-${index}`;
 
                   return (
                     <TableRow
-                      key={row[id]}
+                      key={index}
                       hover
-                      onClick={(event) => handleClick(event, nestedId ? row[id][nestedId] : row[id])}
+                      onClick={() => handleClick(row[id])}
+                      onContextMenu={(event) => {
+                        event.preventDefault();
+                        setSelected([row[id]]);
+                      }}
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
@@ -349,10 +347,10 @@ export default function CustomTable(props) {
         />
       </Paper>
       {/* If needwed enable the switch dense to enable disable dense padding of rows */}
-      {/* <FormControlLabel
+      <FormControlLabel
         control={<Switch checked={dense} onChange={handleChangeDense} />}
         label="Dense padding"
-      /> */}
+      />
     </Box>
   );
 }

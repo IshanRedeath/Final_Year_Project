@@ -206,15 +206,12 @@ export default function Login(props) {
                 </Link>
               </Box>
             </FormControl>
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
+            <FormControlLabel control={<Checkbox value="remember" color="primary" />} label="Remember me" />
             {/* <ForgotPassword open={open} handleClose={handleClose} /> */}
             <Button type="submit" fullWidth variant="contained" onClick={validateInputs}>
               Login
             </Button>
-            <Typography sx={{ textAlign: 'center' }}>
+            {/* <Typography sx={{ textAlign: 'center' }}>
               {' '}
               Are you a new Patient user?{' '}
               <span>
@@ -226,10 +223,10 @@ export default function Login(props) {
                   Sign up
                 </Link>
               </span>
-            </Typography>
+            </Typography> */}
           </Box>
-          <Divider>or</Divider>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {/* <Divider>or</Divider>
+           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Button
               fullWidth
               variant="outlined"
@@ -238,15 +235,10 @@ export default function Login(props) {
             >
               Sign in with Google
             </Button>
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={(e) => {}}
-              startIcon={<FacebookIcon />}
-            >
+            <Button fullWidth variant="outlined" onClick={(e) => {}} startIcon={<FacebookIcon />}>
               Sign in with Facebook
             </Button>
-          </Box>
+          </Box> */}
         </Card>
       </SignInContainer>
       {/* // </AppTheme> */}

@@ -1,4 +1,5 @@
 const User = require("../models/users/userModel");
+const Patient = require("../models/users/patientUserModel");
 const mongoose = require("mongoose");
 const catchAsync = require("../utils/catchAsync");
 
@@ -39,3 +40,6 @@ exports.getUserView = catchAsync(async (req, res) => {
     data: view,
   });
 });
+
+exports.getPatient = handlerFactory.getOne(Patient);
+exports.deletePatient = handlerFactory.deleteOne(Patient);

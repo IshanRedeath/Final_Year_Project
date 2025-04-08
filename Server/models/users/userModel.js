@@ -48,6 +48,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       minlength: 8,
+      select: false,
     },
     roles: {
       type: [String],
@@ -68,9 +69,27 @@ const userSchema = new mongoose.Schema(
       enum: ["active", "inactive", "deleted"],
       default: "active",
     },
+    passwordChangedAt: { type: Date, default: Date.now() },
   },
   { timestamps: true }
 );
+userSchema.methods.correctPassword = async function (
+  candidatePassword,
+  userPassword
+) {
+  return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+  if (this.passwordChangedAt) {
+    const changedTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    );
+    return JWTTimestamp < changedTimestamp;
+  }
+  return false;
+};
 
 //DOCUMENT MIDDLEWARE
 userSchema.post("save", async function (doc, next) {
@@ -124,11 +143,11 @@ userSchema.post(
   }
 );
 
-//donit send password in response
-userSchema.pre(["find", "findOne"], function (next) {
-  this.select("-password");
-  next();
-});
+// //donit send password in response
+// userSchema.pre(["find", "findOne"], function (next) {
+//   this.select("-password");
+//   next();
+// });
 
 const User = mongoose.model("User", userSchema);
 module.exports = User;

@@ -1,13 +1,4 @@
-import {
-  createBrowserRouter,
-  Navigate,
-  Outlet,
-  redirect,
-  RouterProvider,
-  useLocation,
-  ScrollRestoration,
-  useNavigation,
-} from 'react-router-dom';
+import { createBrowserRouter, Navigate, ScrollRestoration, useNavigation } from 'react-router-dom';
 import adminRoutes from './adminRoutes';
 import doctorRoutes from './doctorRoutes';
 import patientRoutes from './patientRoutes';
@@ -15,14 +6,12 @@ import SessionRedirect from './SessionRedirect';
 import PatientHeaderBar from '../layouts/PatientDashboard/PatientHeaderbar';
 import RouteAuth from './RouteAuth';
 import Login from '../pages/patientPortal/Login';
-import { useEffect } from 'react';
-import { Dashboard } from '@mui/icons-material';
+
 import DashboardLayout from '../layouts/Dashboard';
 import Loading from 'components/Loading';
-import AddUser from 'pages/AdminDashboard/Users/temp/AddUser';
-import PrintableComponent from 'components/PrintView/index';
+
 import PrintView from 'components/PrintView';
-import PrintViewHeader from 'components/PrintView/PrintViewHeader';
+
 // Combine routes
 //TODO: EDit session redirect, add patient routes, add unauthorized route
 export const router = createBrowserRouter([

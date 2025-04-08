@@ -47,6 +47,12 @@ const handleMongooseErrorDB = (err) => {
   const message = err.message || `Invalid input data`;
   return new AppError(message, 400);
 };
+
+const handleJWTError = () =>
+  new AppError("Invalid token. Please log in again", 401);
+const handleJWTExpiredError = () =>
+  new AppError("Token expired. Please log in again", 401);
+
 const errorMiddleware = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || "error";
@@ -59,6 +65,8 @@ const errorMiddleware = (err, req, res, next) => {
     if (err.code === 11000) err = handleDuplicateFieldsDB(err);
     if (err.name === "ValidationError") err = handleValidationErrorDB(err);
     if (err.name === "MongooseError") err = handleMongooseErrorDB(err);
+    if (err.name === "JsonWebTokenError") err = handleJWTError(err);
+    if (err.name === "TokenExpiredError") err = handleJWTExpiredError(err);
     // production mode
     sendErrorProd(err, res);
   }

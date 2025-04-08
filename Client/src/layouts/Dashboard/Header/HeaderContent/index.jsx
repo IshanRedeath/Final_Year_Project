@@ -21,8 +21,9 @@ export default function HeaderContent() {
       <Navigation />
       <Box flexGrow="1"></Box>
       <Notification />
-      {/* {!downLG && <Profile />}
-      {downLG && <MobileSection />} */}
+
+      {/* {!downLG && <Profile />} */}
+      {/* {downLG && <MobileSection />} */}
     </>
   );
 }
